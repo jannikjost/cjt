@@ -1,34 +1,59 @@
 <template>
-  <img src="./assets/logo.png">
   <div>
-    <p>
-      If Element Plus is successfully added to this project, you'll see an
-      <code v-text="'<el-button>'"></code>
-      below
-    </p>
-    <el-button type="primary">el-button</el-button>
+    <!-- navigation -->
+    <div class="nav">
+      <div class="nav__element">logo</div>
+      <router-link class="nav__element link" to="/home">Home</router-link>
+      <router-link class="nav__element link" to="/overview"
+        >Overview</router-link
+      >
+    </div>
+    <!-- router links -->
+    <router-view></router-view>
   </div>
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  name: "App",
+  components: {},
+};
 </script>
 
 <style>
+html,
+body {
+  margin: 0;
+  box-sizing: border-box;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+.nav {
+  display: flex;
+  height: 75px;
+  background-color: #a63c86;
+  color: #fff;
+  align-items: center;
+}
+.nav__element {
+  margin: 0 14px;
+  color: #fff;
+}
+
+.link {
+  text-decoration: none;
+  transition: transform 0.2s; /* Animation */
+}
+.link:hover {
+  transform: scale(1.5);
+  border-bottom: 1px solid #fff;
+}
+.link:visited {
+  color: inherit;
 }
 </style>
