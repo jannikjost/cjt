@@ -3,7 +3,7 @@
     <!-- navigation -->
     <div class="nav">
       <div class="nav__element">logo</div>
-      <router-link class="nav__element link" to="/home">Home</router-link>
+      <router-link class="nav__element link" to="/">Home</router-link>
       <router-link class="nav__element link" to="/overview"
         >Overview</router-link
       >
