@@ -1,13 +1,21 @@
 <template>
   <div class="overview">
-    <el-card>history</el-card>
-    <el-card>last 12 months</el-card>
-    <el-card class="chart">chart</el-card>
+    <el-card><History /></el-card>
+    <el-card><LastYear /></el-card>
+    <el-card class="chart"><Chart /></el-card>
   </div>
 </template>
 
 <script>
-export default {};
+import History from "../components/Overview/History.vue";
+import LastYear from "../components/Overview/LastYear.vue";
+import Chart from "../components/Overview/Chart.vue";
+
+export default {
+  setup() {
+    return { History, LastYear, Chart };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
