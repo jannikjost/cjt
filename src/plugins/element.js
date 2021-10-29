@@ -1,6 +1,6 @@
-import ElementPlus from 'element-plus'
-import '../element-variables.scss'
+import ElementPlus from "element-plus";
+import "../styles/element-variables.scss";
 
 export default (app) => {
-  app.use(ElementPlus)
-}
+  app.use(ElementPlus);
+};

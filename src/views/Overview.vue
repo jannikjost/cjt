@@ -12,8 +12,13 @@ import LastYear from "../components/Overview/LastYear.vue";
 import Chart from "../components/Overview/Chart.vue";
 
 export default {
+  components: {
+    History,
+    LastYear,
+    Chart,
+  },
   setup() {
-    return { History, LastYear, Chart };
+    return {};
   },
 };
 </script>

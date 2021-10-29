@@ -1,3 +1,3 @@
-const storeTypes = {}
+const storeTypes = {};
 
-export default storeTypes
+export default storeTypes;

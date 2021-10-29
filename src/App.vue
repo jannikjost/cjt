@@ -25,6 +25,7 @@ html,
 body {
   margin: 0;
   box-sizing: border-box;
+  height: 100%;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -32,6 +33,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
 .nav {
   display: flex;
@@ -39,6 +41,7 @@ body {
   background-color: #a63c86;
   color: #fff;
   align-items: center;
+  margin-bottom: 18px;
 }
 .nav__element {
   margin: 0 14px;
