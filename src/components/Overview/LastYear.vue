@@ -20,31 +20,20 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
+import { getData } from "./../../api/db";
 export default {
   setup() {
-    //TODO get it out of here!!!
-    const tableData = [
-      {
-        date: new Date(26, 23, 2),
-        overtime: "20",
-      },
-      {
-        date: new Date(3, 3, 3),
-        overtime: "19,5",
-      },
-      {
-        date: new Date(2, 2, 2),
-        overtime: "19,25",
-      },
-      {
-        date: new Date(5),
-        overtime: "18,75",
-      },
-    ];
-    const year =
-      formatDate(tableData[0].date) +
-      " - " +
-      formatDate(tableData[tableData.length - 1].date);
+    const tableData = ref([]);
+    const year = ref();
+
+    onMounted(async () => {
+      tableData.value = await getData();
+      year.value =
+        formatDate(tableData.value[0].date) +
+        " - " +
+        formatDate(tableData.value[tableData.value.length - 1].date);
+    });
 
     function formatDate(date) {
       const monthNames = [
@@ -67,8 +56,9 @@ export default {
     }
 
     function formatOvertime(time) {
+      if (!time) return;
       const seperator = ":";
-      const i = time.indexOf(",");
+      const i = time.toString().indexOf(",");
       // Not an odd value
       if (i < 0) {
         return time + seperator + "00";
