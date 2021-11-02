@@ -2,7 +2,8 @@ const dbName = "cjt";
 const objectStoreName = "cjtovertime";
 
 let db;
-
+//TODO data in store, or send event when data changes?
+//TODO data sorting, newest should be on top
 export { createDataBase, addEntry, getData };
 
 function createDataBase() {

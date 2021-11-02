@@ -1,18 +1,23 @@
 <template>
   <div class="lastYear">
     <p>{{ year }}</p>
-    <el-table :data="tableData" style="width: 100%" :show-header="false">
-      <el-table-column prop="date">
+    <el-table :data="tableData" style="width: 100%">
+      <el-table-column prop="date" label="Month">
         <template #default="scope">
           <i class="el-icon-time"></i>
           <span style="margin-left: 10px">{{
-            formatDate(scope.row.date)
+            formatDateMonthYear(scope.row.date)
           }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="overtime">
+      <el-table-column prop="overtime" label="Overtime">
         <template #default="scope">
           <span>{{ formatOvertime(scope.row.overtime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="overtimeThisMonth" label="Overtime this Month">
+        <template #default="scope">
+          <span>{{ formatOvertime(scope.row.overtimeThisMonth) }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -22,72 +27,57 @@
 <script>
 import { ref, onMounted } from "vue";
 import { getData } from "./../../api/db";
+import {
+  formatOvertime,
+  formatDateMonthYear,
+} from "./../../services/formatter";
+
 export default {
   setup() {
     const tableData = ref([]);
     const year = ref();
 
     onMounted(async () => {
-      tableData.value = await getData();
+      //TODO calculate value for each month
+      let data = await getData();
+      data.sort((a, b) => {
+        return b.date - a.date;
+      });
+      const d = [];
+      // let index = 0;
+      // let currMonth = 0;
+      data.forEach((el) => {
+        if (!d[el.date.getMonth()]) {
+          d[el.date.getMonth()] = {
+            date: el.date,
+            overtime: el.overtime,
+            overtimeThisMonth: el.overtime,
+          };
+          console.log(d);
+          if (d[el.date.getMonth() + 1]) {
+            d[el.date.getMonth() + 1].overtimeThisMonth =
+              d[el.date.getMonth() + 1].overtimeThisMonth - el.overtime;
+          }
+        }
+      });
+      d.sort((a, b) => {
+        return b.date - a.date;
+      });
+      tableData.value = d;
+      console.log(tableData.value);
+      //TODO not working, because only one month?
       year.value =
-        formatDate(tableData.value[0].date) +
+        formatDateMonthYear(tableData.value[tableData.value.length - 1].date) +
         " - " +
-        formatDate(tableData.value[tableData.value.length - 1].date);
+        formatDateMonthYear(tableData.value[0].date);
     });
-
-    function formatDate(date) {
-      const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
-      const year = date.getFullYear();
-      const month = monthNames[date.getMonth()];
-      return month + " " + year;
-    }
-
-    function formatOvertime(time) {
-      if (!time) return;
-      const seperator = ":";
-      const i = time.toString().indexOf(",");
-      // Not an odd value
-      if (i < 0) {
-        return time + seperator + "00";
-      }
-      const hours = time.substring(0, i);
-      const minutes = time.substring(i + 1, time.length);
-      var formattedMinutes;
-      switch (minutes) {
-        case "25":
-          formattedMinutes = "15";
-          break;
-        case "5":
-          formattedMinutes = "30";
-          break;
-        case "75":
-          formattedMinutes = "45";
-          break;
-        default:
-          break;
-      }
-      return hours + seperator + formattedMinutes;
-    }
 
     return {
       tableData,
       year,
 
-      formatDate,
       formatOvertime,
+      formatDateMonthYear,
     };
   },
 };
