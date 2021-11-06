@@ -38,34 +38,35 @@ export default {
     const year = ref();
 
     onMounted(async () => {
-      //TODO calculate value for each month
       let data = await getData();
       data.sort((a, b) => {
         return b.date - a.date;
       });
-      const d = [];
-      // let index = 0;
-      // let currMonth = 0;
+      const monthlyOverview = [];
+      let index = -1;
+      let currMonth = 0;
       data.forEach((el) => {
-        if (!d[el.date.getMonth()]) {
-          d[el.date.getMonth()] = {
+        const month = el.date.getMonth();
+        if (currMonth !== month) {
+          index++;
+        }
+
+        if (!monthlyOverview[index]) {
+          currMonth = month;
+          monthlyOverview[index] = {
             date: el.date,
             overtime: el.overtime,
             overtimeThisMonth: el.overtime,
           };
-          console.log(d);
-          if (d[el.date.getMonth() + 1]) {
-            d[el.date.getMonth() + 1].overtimeThisMonth =
-              d[el.date.getMonth() + 1].overtimeThisMonth - el.overtime;
+          //calculate the overtime made the previous month
+          const lastMonth = monthlyOverview[index - 1];
+          if (lastMonth) {
+            lastMonth.overtimeThisMonth -= el.overtime;
           }
         }
       });
-      d.sort((a, b) => {
-        return b.date - a.date;
-      });
-      tableData.value = d;
-      console.log(tableData.value);
-      //TODO not working, because only one month?
+      tableData.value = monthlyOverview;
+      //? what happens if only one month is in db
       year.value =
         formatDateMonthYear(tableData.value[tableData.value.length - 1].date) +
         " - " +

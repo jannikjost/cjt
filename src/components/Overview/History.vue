@@ -1,7 +1,12 @@
 <template>
   <div class="history">
     <div class="table">
-      <el-table :data="tableData" style="width: 100%" :show-header="false">
+      <el-table
+        :data="tableData"
+        style="width: 100%"
+        height="400px"
+        :show-header="false"
+      >
         <el-table-column prop="date">
           <template #default="scope">
             <i class="el-icon-time"></i>
