@@ -124,7 +124,7 @@ export default {
         overtime: newOvertime,
       };
       try {
-        await store.commit("addOvertime", overtimeObject);
+        await store.dispatch("addOvertime", overtimeObject);
         ElMessage({
           type: "success",
           message: "Add Overtime completed",
