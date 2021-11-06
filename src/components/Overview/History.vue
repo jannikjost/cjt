@@ -1,13 +1,8 @@
 <template>
   <div class="history">
     <div class="table">
-      <el-table
-        :data="storeOvertimeData"
-        style="width: 100%"
-        height="400px"
-        :show-header="false"
-      >
-        <el-table-column prop="date">
+      <el-table :data="storeOvertimeData" style="width: 100%" height="400px">
+        <el-table-column prop="date" label="Date">
           <template #default="scope">
             <i class="el-icon-time"></i>
             <span style="margin-left: 10px">{{
@@ -15,7 +10,12 @@
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="overtime">
+        <el-table-column prop="overtimeThatDay" label="Minutes">
+          <template #default="scope">
+            <span>{{ formatOvertime(scope.row.overtime) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="overtime" label="Overtime">
           <template #default="scope">
             <span>{{ formatOvertime(scope.row.overtime) }}</span>
           </template>
@@ -68,7 +68,7 @@ export default {
     ];
 
     onMounted(async () => {
-      //TODO add load state
+      //? load store in overview
       store.dispatch("loadData");
     });
 
