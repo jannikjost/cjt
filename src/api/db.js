@@ -22,7 +22,7 @@ function createDataBase() {
     db.onerror = function(event) {
       // Generic error handler for all errors targeted at this database's
       // requests!
-      console.error("Database error: " + event.target.errorCode);
+      console.error("Database error: " + event.target.error.message);
     };
   };
 
@@ -43,15 +43,19 @@ function createDataBase() {
 }
 
 function addEntry(data) {
-  const transaction = createTransaction("readwrite");
-  const objectStore = transaction.objectStore(objectStoreName);
-  var request = objectStore.add(data);
-  request.onerror = function(event) {
-    console.log("Request error: " + event.target.errorCode);
-  };
-  request.onsuccess = function() {
-    console.log("Request success");
-  };
+  return new Promise((resolve, reject) => {
+    const transaction = createTransaction("readwrite");
+    const objectStore = transaction.objectStore(objectStoreName);
+    var request = objectStore.add(data);
+    request.onerror = function(event) {
+      console.error("Request error: " + event.target.error.message);
+      reject("Request error: " + event.target.error.message);
+    };
+    request.onsuccess = function() {
+      console.log("Request success");
+      resolve();
+    };
+  });
 }
 
 function getData() {
@@ -74,7 +78,7 @@ function createTransaction(mode) {
     console.log("Transaction done!");
   };
   transaction.onerror = function(event) {
-    console.error("Transaction error: " + event.target.errorCode);
+    console.error("Transaction error: " + event.target.error.message);
   };
 
   return transaction;

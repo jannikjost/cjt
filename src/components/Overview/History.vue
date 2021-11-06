@@ -2,7 +2,7 @@
   <div class="history">
     <div class="table">
       <el-table
-        :data="tableData"
+        :data="storeOvertimeData"
         style="width: 100%"
         height="400px"
         :show-header="false"
@@ -39,15 +39,17 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { addEntry, getData } from "./../../api/db";
+import { ref, onMounted, computed } from "vue";
 import {
   formatOvertime,
   formatDateDayMonthYear,
 } from "./../../services/formatter";
+import { useStore } from "vuex";
+import { ElMessageBox, ElMessage } from "element-plus";
 
 export default {
   setup() {
+    const store = useStore();
     const date = ref(new Date());
     const overtime = ref(0);
     const shortcuts = [
@@ -64,37 +66,74 @@ export default {
         },
       },
     ];
-    const tableData = ref([]);
 
     onMounted(async () => {
-      let data = await getData();
-      data.sort((a, b) => {
-        return b.date - a.date;
-      });
-      tableData.value = data;
+      //TODO add load state
+      store.dispatch("loadData");
     });
 
-    function addOvertime() {
-      //TODO refresh data
+    const storeOvertimeData = computed(() => {
+      return store.state.moduleOvertime.overtime;
+    });
+
+    async function addOvertime() {
       //TODO sometimes date does not work, select dec.1
       //TODO selecting passed date does not work
+      //TODO selecting current date also saves time
       if (date.value && overtime.value) {
+        // check if entry for given date already exists
         if (
-          tableData.value.filter((el) => {
-            return el.date.getDate() === date.value.getDate();
+          store.state.moduleOvertime.overtime.filter((el) => {
+            return el.date.getTime() === date.value.getTime();
           }).length
         ) {
-          //TODO replace old value for that date or dont allow it?
+          //TODO get old overtime
+          try {
+            await ElMessageBox.confirm(
+              `Replace old value: ${overtime.value} with new value: ${overtime.value}?`,
+              `Entry for ${date.value.toLocaleDateString()} already exists`,
+              {
+                confirmButtonText: "OK",
+                cancelButtonText: "Cancel",
+              }
+            );
+            //TODO overwrite entry
+            ElMessage({
+              type: "success",
+              message: "Overwrite completed",
+            });
+          } catch {
+            ElMessage({
+              type: "info",
+              message: "Overwrite canceled",
+            });
+          }
           return;
         }
-        const newOvertime = tableData.value.length
-          ? tableData.value[0].overtime + overtime.value
-          : overtime.value;
-        const overtimeObject = {
-          date: date.value,
-          overtime: newOvertime,
-        };
-        addEntry(overtimeObject);
+        addEntry();
+      }
+    }
+
+    //TODO sort after adding value in cause older date gets entered, prob in store
+    async function addEntry() {
+      const newOvertime = store.state.moduleOvertime.overtime.length
+        ? store.state.moduleOvertime.overtime[0].overtime + overtime.value
+        : overtime.value;
+      const overtimeObject = {
+        date: date.value,
+        overtime: newOvertime,
+      };
+      try {
+        await store.commit("addOvertime", overtimeObject);
+        ElMessage({
+          type: "success",
+          message: "Add Overtime completed",
+        });
+      } catch {
+        ElMessage({
+          type: "error",
+          message: "Add Overtime failed",
+        });
       }
     }
 
@@ -129,7 +168,9 @@ export default {
       date,
       overtime,
       shortcuts,
-      tableData,
+
+      //computed
+      storeOvertimeData,
 
       //functions
       addOvertime,
