@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app">
     <!-- navigation -->
     <div class="nav">
       <div class="nav__element">logo</div>
@@ -35,13 +35,19 @@ body {
   color: #2c3e50;
   height: 100%;
 }
+.app {
+  /* height: calc(100% - 93px); */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+}
 .nav {
   display: flex;
   height: 75px;
   background-color: #a63c86;
   color: #fff;
   align-items: center;
-  margin-bottom: 18px;
 }
 .nav__element {
   margin: 0 14px;

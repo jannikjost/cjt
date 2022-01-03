@@ -1,6 +1,7 @@
 <template>
   <div class="history">
     <div class="table">
+      <!-- //TODO add heigth option for Home -->
       <el-table :data="storeOvertimeData" style="width: 100%" height="400px">
         <el-table-column prop="date" label="Date">
           <template #default="scope">
@@ -10,7 +11,7 @@
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="overtimeThatDay" label="Minutes">
+        <el-table-column prop="minutes" label="Minutes">
           <template #default="scope">
             <span>{{ formatOvertime(scope.row.overtime) }}</span>
           </template>
