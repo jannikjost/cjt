@@ -16,6 +16,8 @@
         v-on:stopworktime="StopTaskWorkTime"
         v-on:removeworktime="RemoveWorkTime"
         :id="time.id"
+        :startTime2="time.startTime"
+        :stopTime2="time.stopTime"
       />
     </div>
   </el-collapse-item>
@@ -39,6 +41,7 @@ export default {
     });
 
     const storeTaskTimes = computed(() => {
+      console.log(store.getters.getTaskById(props.id).times);
       return store.getters.getTaskById(props.id).times;
     });
 

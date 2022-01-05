@@ -12,7 +12,7 @@ const moduleTimes = {
   },
   mutations: {
     addTime(state, id) {
-      state.times.push({ id, startTime: "", stopTime: "", time: 0 });
+      state.times.push({ id });
     },
     setStartTime(state, props) {
       state.times.forEach((element) => {

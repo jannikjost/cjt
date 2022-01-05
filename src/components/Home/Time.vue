@@ -23,11 +23,13 @@ import { ref, computed } from "vue";
 export default {
   props: {
     id: String,
+    startTime2: Object,
+    stopTime2: Object,
   },
   emits: ["removeworktime", "startworktime", "stopworktime"],
   setup(props, { emit }) {
-    const startDate = ref();
-    const stopDate = ref();
+    const startDate = ref(props.startTime2);
+    const stopDate = ref(props.stopTime2);
 
     const buttonText = computed(() => {
       if (startDate.value && stopDate.value) {
