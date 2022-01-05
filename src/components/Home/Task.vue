@@ -11,7 +11,7 @@
     <div>
       <Time
         v-for="time in storeTaskTimes"
-        :key="time"
+        :key="time.id"
         v-on:startworktime="StartTaskWorkTime"
         v-on:stopworktime="StopTaskWorkTime"
         v-on:removeworktime="RemoveWorkTime"
@@ -50,8 +50,11 @@ export default {
       if (time) {
         time.startTime = params.startTime;
       }
-      store.dispatch("startStopWorkDay", true);
-      //TODO tell store to sync data with db
+      store.dispatch("startWorkTime", {
+        taskId: props.id,
+        taskTimeId: params.id,
+        startTime: params.startTime,
+      });
     }
     function StopTaskWorkTime(params) {
       const time = store.getters.getTaskTimeById({

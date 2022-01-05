@@ -12,7 +12,14 @@ const moduleTimes = {
   },
   mutations: {
     addTime(state, id) {
-      state.times.push({ id });
+      state.times.push({ id, startTime: "", stopTime: "", time: 0 });
+    },
+    setStartTime(state, props) {
+      state.times.forEach((element) => {
+        if (element.id === props.id) {
+          element.startTime = props.startTime;
+        }
+      });
     },
   },
   actions: {
@@ -24,6 +31,10 @@ const moduleTimes = {
         resolve(id);
         reject();
       });
+    },
+    setStartTime(context, props) {
+      context.commit("setStartTime", props);
+      //TODO sync with db
     },
   },
 };

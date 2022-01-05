@@ -69,7 +69,7 @@ export default {
     };
 
     function addNewTask() {
-      store.commit("addNewTask");
+      store.dispatch("addNewTask");
     }
 
     function feierabend() {

@@ -21,11 +21,11 @@ const moduleWorktimeTracker = {
     },
   },
   mutations: {
-    addNewTask(state) {
+    addNewTask(state, id) {
       state.workday.tasks.push({
         id: v4(),
         name: "",
-        times: [{ id: v4() }],
+        times: [{ id }],
         time: 0,
       });
     },
@@ -83,6 +83,15 @@ const moduleWorktimeTracker = {
     },
   },
   actions: {
+    async addNewTask(context) {
+      const timeId = await context.dispatch("addNewTime");
+      context.commit("addNewTask", timeId);
+      return new Promise((resolve, reject) => {
+        //TODO sync with db
+        resolve();
+        reject();
+      });
+    },
     changeTaskName(context, props) {
       return new Promise((resolve, reject) => {
         context.commit("renameTask", props);
@@ -91,8 +100,12 @@ const moduleWorktimeTracker = {
         reject();
       });
     },
-    startStopWorkDay(context, prop) {
+    startWorkTime(context, prop) {
       context.commit("startStopWorkDay", prop);
+      context.dispatch("setStartTime", {
+        id: prop.taskTimeId,
+        startTime: prop.startTime,
+      });
       //TODO sync with db
     },
     finishWorkDay(context) {
