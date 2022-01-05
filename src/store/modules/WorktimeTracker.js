@@ -52,6 +52,27 @@ const moduleWorktimeTracker = {
       }
       state.workday.isFinished = !prop;
     },
+    stopWorkTime(state, props) {
+      //TODO times in own store???
+      state.workday.tasks = state.workday.tasks.map((task) => {
+        if (task.id !== props.taskId) return task;
+        return {
+          ...task,
+          times: task.times.map((el) => {
+            if (el.id === props.taskTimeId) {
+              el.time = props.time;
+              el.stopTime = props.stopTime;
+            }
+            return el;
+          }),
+        };
+      });
+      const task = state.workday.tasks.find((el) => el.id === props.taskId);
+
+      const time = task.times.find((el) => el.id === props.taskTimeId);
+      time.time = props.time;
+      time.stopTime = props.stopTime;
+    },
     addNewTaskTime(state, taskId) {
       const task = state.workday.tasks.find((el) => el.id === taskId);
       task.times.push({
@@ -79,9 +100,15 @@ const moduleWorktimeTracker = {
       context.commit("calculateWorktime");
       //TODO sync with db
     },
-    addNewTaskTime(context, taskId) {
-      context.commit("addNewTaskTime", taskId);
-      //TODO sync with db
+    stopTaskWorkTime(context, props) {
+      return new Promise((resolve, reject) => {
+        context.commit("startStopWorkDay", false);
+        context.commit("stopWorkTime", props);
+        context.commit("addNewTaskTime", props.taskId);
+        //TODO sync with db
+        resolve();
+        reject();
+      });
     },
   },
 };

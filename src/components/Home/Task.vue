@@ -22,11 +22,10 @@
 </template>
 
 <script>
-import { computed, onMounted } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
-import { v4 } from "uuid";
 import { ElMessage } from "element-plus";
 
 export default {
@@ -41,14 +40,6 @@ export default {
 
     const storeTaskTimes = computed(() => {
       return store.getters.getTaskById(props.id).times;
-    });
-
-    onMounted(() => {
-      storeTaskTimes.value.push({
-        id: v4(),
-        startTime: "",
-        stopTime: "",
-      });
     });
 
     function StartTaskWorkTime(params) {
@@ -77,9 +68,6 @@ export default {
         stopTime: params.stopTime,
         time: params.time,
       });
-      store.dispatch("addNewTaskTime", props.id);
-      store.dispatch("startStopWorkDay", false);
-      //TODO tell store to sync data with db
     }
     function RemoveWorkTime(param) {
       if (storeTaskTimes.value.length > 1) {
