@@ -6,7 +6,7 @@
         v-model="storeTask.name"
         @change="Debounce(SyncTaskName($event), 250)"
       />
-      <label>{{ storeTask.time }}</label>
+      <label>{{ formattedTime }}</label>
     </template>
     <div>
       <Time
@@ -29,6 +29,7 @@ import { useStore } from "vuex";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
 import { ElMessage } from "element-plus";
+import { convertMinsToHrsMins } from "./../../services/formatter";
 
 export default {
   components: { Time },
@@ -36,23 +37,19 @@ export default {
   setup(props) {
     const store = useStore();
 
+    const formattedTime = computed(() => {
+      return convertMinsToHrsMins(storeTask.value.time);
+    });
+
     const storeTask = computed(() => {
       return store.getters.getTaskById(props.id);
     });
 
     const storeTaskTimes = computed(() => {
-      console.log(store.getters.getTaskById(props.id).times);
       return store.getters.getTaskById(props.id).times;
     });
 
     function StartTaskWorkTime(params) {
-      const time = store.getters.getTaskTimeById({
-        taskId: props.id,
-        taskTimeId: params.id,
-      });
-      if (time) {
-        time.startTime = params.startTime;
-      }
       store.dispatch("startWorkTime", {
         taskId: props.id,
         taskTimeId: params.id,
@@ -60,14 +57,6 @@ export default {
       });
     }
     function StopTaskWorkTime(params) {
-      const time = store.getters.getTaskTimeById({
-        taskId: props.id,
-        taskTimeId: params.id,
-      });
-      if (time) {
-        time.stopTime = params.stopTime;
-        time.time = params.time;
-      }
       store.dispatch("stopTaskWorkTime", {
         taskId: props.id,
         taskTimeId: params.id,
@@ -76,13 +65,13 @@ export default {
       });
     }
     function RemoveWorkTime(param) {
+      //TODO store has to do the remove operation
       if (storeTaskTimes.value.length > 1) {
         storeTaskTimes.value.forEach((element, index) => {
           if (element.id === param.id) {
             storeTaskTimes.value.splice(index, 1);
           }
         });
-        //TODO tell store to sync data with db
       }
     }
     async function SyncTaskName(newName) {
@@ -102,6 +91,7 @@ export default {
 
     return {
       //computed
+      formattedTime,
       storeTask,
       storeTaskTimes,
       //functions

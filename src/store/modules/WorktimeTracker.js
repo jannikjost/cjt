@@ -21,11 +21,11 @@ const moduleWorktimeTracker = {
     },
   },
   mutations: {
-    addNewTask(state, id) {
+    addNewTask(state) {
       state.workday.tasks.push({
         id: v4(),
         name: "",
-        times: [{ id }],
+        times: [{ id: v4() }],
         time: 0,
       });
     },
@@ -37,15 +37,18 @@ const moduleWorktimeTracker = {
         }
       }
     },
-    //TODO its all fucked
     calculateWorktime(state) {
+      let tempWorkTime = 0;
       state.workday.tasks.forEach((element) => {
-        state.workday.time += element.time;
+        tempWorkTime += element.time;
       });
+      state.workday.time = tempWorkTime;
+      state.workday.percentage =
+        state.workday.time > 0 ? 8 / state.workday.time : 0;
+
       return state.workday.time;
     },
     startStopWorkDay(state, prop) {
-      //TODO on stop get real percentage
       //progress animation does not work with 0 percentage
       if (prop && state.workday.percentage === 0) {
         state.workday.percentage = 10;
@@ -53,25 +56,23 @@ const moduleWorktimeTracker = {
       state.workday.isFinished = !prop;
     },
     stopWorkTime(state, props) {
-      //TODO times in own store???
-      state.workday.tasks = state.workday.tasks.map((task) => {
-        if (task.id !== props.taskId) return task;
-        return {
-          ...task,
-          times: task.times.map((el) => {
-            if (el.id === props.taskTimeId) {
-              el.time = props.time;
-              el.stopTime = props.stopTime;
-            }
-            return el;
-          }),
-        };
-      });
       const task = state.workday.tasks.find((el) => el.id === props.taskId);
-
       const time = task.times.find((el) => el.id === props.taskTimeId);
       time.time = props.time;
       time.stopTime = props.stopTime;
+      let tempTime = 0;
+      task.times.forEach((el) => {
+        if (!el.time) {
+          return;
+        }
+        tempTime += el.time;
+      });
+      task.time = tempTime;
+    },
+    setStartTime(state, props) {
+      const task = state.workday.tasks.find((el) => el.id === props.taskId);
+      const time = task.times.find((el) => el.id === props.taskTimeId);
+      time.startTime = props.startTime;
     },
     addNewTaskTime(state, taskId) {
       const task = state.workday.tasks.find((el) => el.id === taskId);
@@ -84,8 +85,7 @@ const moduleWorktimeTracker = {
   },
   actions: {
     async addNewTask(context) {
-      const timeId = await context.dispatch("addNewTime");
-      context.commit("addNewTask", timeId);
+      context.commit("addNewTask");
       return new Promise((resolve, reject) => {
         //TODO sync with db
         resolve();
@@ -102,8 +102,9 @@ const moduleWorktimeTracker = {
     },
     startWorkTime(context, prop) {
       context.commit("startStopWorkDay", prop);
-      context.dispatch("setStartTime", {
-        id: prop.taskTimeId,
+      context.commit("setStartTime", {
+        taskId: prop.taskId,
+        taskTimeId: prop.taskTimeId,
         startTime: prop.startTime,
       });
       //TODO sync with db
@@ -115,8 +116,9 @@ const moduleWorktimeTracker = {
     },
     stopTaskWorkTime(context, props) {
       return new Promise((resolve, reject) => {
-        context.commit("startStopWorkDay", false);
         context.commit("stopWorkTime", props);
+        context.commit("calculateWorktime");
+        context.commit("startStopWorkDay", false);
         context.commit("addNewTaskTime", props.taskId);
         //TODO sync with db
         resolve();

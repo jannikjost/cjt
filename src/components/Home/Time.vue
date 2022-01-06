@@ -58,9 +58,7 @@ export default {
     }
 
     function timeChanged() {
-      console.log("change");
       if (startDate.value && stopDate.value) {
-        calculateTimeDifference();
         emit("stopworktime", {
           id: props.id,
           time: calculateTimeDifference(),
@@ -70,11 +68,12 @@ export default {
     }
 
     function calculateTimeDifference() {
-      let diff = stopDate.value.getTime() - startDate.value.getTime();
-      const hours = Math.trunc(diff / 1000 / 60 / 60);
-      diff -= hours * 1000 * 60 * 60;
-      const minutes = Math.trunc(diff / 1000 / 60);
-      return hours + "," + minutes;
+      const hours = stopDate.value.getHours() - startDate.value.getHours();
+      const minutes =
+        stopDate.value.getMinutes() - startDate.value.getMinutes();
+
+      const minutesDiff = minutes + hours * 60;
+      return minutesDiff;
     }
 
     function removeWorkTime() {

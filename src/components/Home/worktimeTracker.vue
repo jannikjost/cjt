@@ -10,7 +10,7 @@
         :color="customColorMethod"
         :percentage="percentage"
         :indeterminate="!workdayFinished"
-        ><span>{{ storeWorktime }}</span></el-progress
+        ><span>{{ workTime }}</span></el-progress
       >
       <el-button class="feierabend" type="primary" @click="feierabend"
         ><div class="feierabend__container">
@@ -29,6 +29,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import Task from "./Task.vue";
+import { convertMinsToHrsMins } from "./../../services/formatter";
 
 export default {
   components: { Task },
@@ -39,6 +40,10 @@ export default {
     onMounted(() => {
       if (store.state.moduleWorktimeTracker.workday.tasks.length) return;
       addNewTask();
+    });
+
+    const workTime = computed(() => {
+      return convertMinsToHrsMins(storeWorktime.value);
     });
 
     const storeTasks = computed(() => {
@@ -89,6 +94,7 @@ export default {
       workdayFinished,
       isFeierabend,
       //computed
+      workTime,
       storeTasks,
       storeWorktime,
       //functions
