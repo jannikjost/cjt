@@ -13,7 +13,9 @@
       :format="'HH:mm'"
     />
     <el-button @click="startStopWorktime">{{ buttonText }}</el-button>
-    <el-button @click="removeWorkTime">x</el-button>
+    <el-button @click="removeWorkTime" :disabled="!startDate && !stopDate"
+      >x</el-button
+    >
   </div>
 </template>
 
@@ -57,6 +59,7 @@ export default {
       emit("startworktime", { id: props.id, startTime: startDate.value });
     }
 
+    //TODO changing startTime does not work, need seperate function
     function timeChanged() {
       if (startDate.value && stopDate.value) {
         emit("stopworktime", {
@@ -77,6 +80,7 @@ export default {
     }
 
     function removeWorkTime() {
+      //?
       startDate.value = "";
       stopDate.value = "";
       //TODO porps.id should be enough

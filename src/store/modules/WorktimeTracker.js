@@ -61,6 +61,7 @@ const moduleWorktimeTracker = {
       time.time = props.time;
       time.stopTime = props.stopTime;
       let tempTime = 0;
+      //TODO negative times
       task.times.forEach((el) => {
         if (!el.time) {
           return;
@@ -76,11 +77,26 @@ const moduleWorktimeTracker = {
     },
     addNewTaskTime(state, taskId) {
       const task = state.workday.tasks.find((el) => el.id === taskId);
-      task.times.push({
-        id: v4(),
-        startTime: "",
-        stopTime: "",
+      if (task.times.at(-1).startTime) {
+        task.times.push({
+          id: v4(),
+        });
+      }
+    },
+    removeTaskWorkTime(state, props) {
+      const task = state.workday.tasks.find((el) => el.id === props.taskId);
+      task.times.forEach((element, index) => {
+        if (element.id === props.taskTimeId) {
+          task.times.splice(index, 1);
+        }
       });
+    },
+    resetTaskWorkTime(state, props) {
+      const task = state.workday.tasks.find((el) => el.id === props.taskId);
+      const time = task.times.find((el) => el.id === props.taskTimeId);
+      delete time.time;
+      delete time.startTime;
+      delete time.stopTime;
     },
   },
   actions: {
@@ -124,6 +140,14 @@ const moduleWorktimeTracker = {
         resolve();
         reject();
       });
+    },
+    removeTaskWorkTime(context, props) {
+      const task = context.getters.getTaskById(props.taskId);
+      if (task.times.length > 1) {
+        context.commit("removeTaskWorkTime", props);
+      } else {
+        context.commit("resetTaskWorkTime", props);
+      }
     },
   },
 };

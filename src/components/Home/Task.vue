@@ -65,14 +65,10 @@ export default {
       });
     }
     function RemoveWorkTime(param) {
-      //TODO store has to do the remove operation
-      if (storeTaskTimes.value.length > 1) {
-        storeTaskTimes.value.forEach((element, index) => {
-          if (element.id === param.id) {
-            storeTaskTimes.value.splice(index, 1);
-          }
-        });
-      }
+      store.dispatch("removeTaskWorkTime", {
+        taskId: props.id,
+        taskTimeId: param.id,
+      });
     }
     async function SyncTaskName(newName) {
       try {
