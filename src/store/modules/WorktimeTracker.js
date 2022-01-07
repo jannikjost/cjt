@@ -98,6 +98,22 @@ const moduleWorktimeTracker = {
       delete time.startTime;
       delete time.stopTime;
     },
+    removeTask(state, id) {
+      state.workday.tasks.forEach((el, i) => {
+        if (el.id === id) {
+          state.workday.tasks.splice(i, 1);
+        }
+      });
+    },
+    resetTask(state, id) {
+      state.workday.tasks.forEach((el) => {
+        if (el.id === id) {
+          el.name = "";
+          el.time = 0;
+          el.times = [{ id: v4() }];
+        }
+      });
+    },
   },
   actions: {
     async addNewTask(context) {
@@ -148,6 +164,15 @@ const moduleWorktimeTracker = {
       } else {
         context.commit("resetTaskWorkTime", props);
       }
+      //TODO sync with db
+    },
+    removeTask(context, id) {
+      context.commit("removeTask", id);
+      //TODO sync with db
+    },
+    resetTask(context, id) {
+      context.commit("resetTask", id);
+      //TODO sync with db
     },
   },
 };

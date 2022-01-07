@@ -7,6 +7,7 @@
         @change="Debounce(SyncTaskName($event), 250)"
       />
       <label>{{ formattedTime }}</label>
+      <el-button type="danger" @click="RemoveTask">x</el-button>
     </template>
     <div>
       <Time
@@ -28,7 +29,7 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { convertMinsToHrsMins } from "./../../services/formatter";
 
 export default {
@@ -85,6 +86,36 @@ export default {
       }
     }
 
+    async function RemoveTask() {
+      const moreThanOneTask =
+        store.state.moduleWorktimeTracker.workday.tasks.length > 1;
+      const text = moreThanOneTask ? "delete" : "reset";
+      try {
+        await ElMessageBox.confirm(
+          `Are you sure you want to ${text} Task "${storeTask.value.name}" with ${formattedTime.value} h?`,
+          `Confirm ${text} Task`,
+          {
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+          }
+        );
+        if (moreThanOneTask) {
+          store.dispatch("removeTask", props.id);
+        } else {
+          store.dispatch("resetTask", props.id);
+        }
+        ElMessage({
+          type: "success",
+          message: `${text} completed`,
+        });
+      } catch {
+        ElMessage({
+          type: "info",
+          message: `${text} canceled`,
+        });
+      }
+    }
+
     return {
       //computed
       formattedTime,
@@ -96,6 +127,7 @@ export default {
       RemoveWorkTime,
       SyncTaskName,
       Debounce,
+      RemoveTask,
     };
   },
 };
