@@ -7,49 +7,55 @@ let db;
 export { createDataBase, addEntry, getData, updateWorkday };
 
 function createDataBase() {
-  if (!window.indexedDB) {
-    console.log("Your Browser doesn't support a stable version of IndexedDB.");
-  }
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      console.log(
+        "Your Browser doesn't support a stable version of IndexedDB."
+      );
+    }
 
-  let request = window.indexedDB.open(dbName);
+    let request = window.indexedDB.open(dbName);
 
-  request.onerror = function() {
-    console.log("Why didn't you allow my web app to use IndexedDB?!");
-  };
-  request.onsuccess = function(event) {
-    db = event.target.result;
-
-    db.onerror = function(event) {
-      // Generic error handler for all errors targeted at this database's
-      // requests!
-      console.error("Database error: " + event.target.error.message);
+    request.onerror = function() {
+      reject();
+      console.log("Why didn't you allow my web app to use IndexedDB?!");
     };
-  };
+    request.onsuccess = function(event) {
+      db = event.target.result;
+      resolve();
+      db.onerror = function(event) {
+        // Generic error handler for all errors targeted at this database's
+        // requests!
 
-  request.onupgradeneeded = function(event) {
-    // Save the IDBDatabase interface
-    db = event.target.result;
-
-    // Create an objectStore for this database
-    var objectStore = db.createObjectStore(objectStoreName, {
-      keyPath: "date",
-    });
-    //TODO add new entry, minutes(overtime that day)
-    objectStore.createIndex("date", "date", { unique: true });
-    objectStore.createIndex("overtime", "overtime", { unique: false });
-    objectStore.transaction.oncomplete = function() {
-      console.log(objectStoreName + " successfully created");
+        console.error("Database error: " + event.target.error.message);
+      };
     };
 
-    var objectStore2 = db.createObjectStore("workday", {
-      keyPath: "id",
-    });
-    objectStore2.createIndex("id", "id", { unique: true });
-    objectStore2.createIndex("workday", "workday", { unique: false });
-    objectStore2.transaction.oncomplete = function() {
-      console.log("workday" + " successfully created");
+    request.onupgradeneeded = function(event) {
+      // Save the IDBDatabase interface
+      db = event.target.result;
+
+      // Create an objectStore for this database
+      var objectStore = db.createObjectStore(objectStoreName, {
+        keyPath: "date",
+      });
+      //TODO add new entry, minutes(overtime that day)
+      objectStore.createIndex("date", "date", { unique: true });
+      objectStore.createIndex("overtime", "overtime", { unique: false });
+      objectStore.transaction.oncomplete = function() {
+        console.log(objectStoreName + " successfully created");
+      };
+
+      var objectStore2 = db.createObjectStore("workday", {
+        keyPath: "id",
+      });
+      objectStore2.createIndex("id", "id", { unique: true });
+      objectStore2.createIndex("workday", "workday", { unique: false });
+      objectStore2.transaction.oncomplete = function() {
+        console.log("workday" + " successfully created");
+      };
     };
-  };
+  });
 }
 
 function addEntry(data) {
