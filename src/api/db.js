@@ -1,10 +1,10 @@
 const dbName = "cjt";
-const objectStoreName = "cjtovertime";
+const objectStoreName = "overtime";
 
 let db;
 //TODO data in store, or send event when data changes?
 //TODO data sorting, newest should be on top
-export { createDataBase, addEntry, getData };
+export { createDataBase, addEntry, getData, updateWorkday };
 
 function createDataBase() {
   if (!window.indexedDB) {
@@ -40,6 +40,15 @@ function createDataBase() {
     objectStore.transaction.oncomplete = function() {
       console.log(objectStoreName + " successfully created");
     };
+
+    var objectStore2 = db.createObjectStore("workday", {
+      keyPath: "id",
+    });
+    objectStore2.createIndex("id", "id", { unique: true });
+    objectStore2.createIndex("workday", "workday", { unique: false });
+    objectStore2.transaction.oncomplete = function() {
+      console.log("workday" + " successfully created");
+    };
   };
 }
 
@@ -74,7 +83,7 @@ function getData() {
 }
 
 function createTransaction(mode) {
-  var transaction = db.transaction([objectStoreName], mode);
+  var transaction = db.transaction([objectStoreName, "workday"], mode);
   transaction.oncomplete = function() {
     console.log("Transaction done!");
   };
@@ -83,4 +92,20 @@ function createTransaction(mode) {
   };
 
   return transaction;
+}
+
+function updateWorkday(newWorkday) {
+  return new Promise(function(resolve, reject) {
+    const transaction = createTransaction("readwrite");
+    const objectStore = transaction.objectStore("workday");
+    var request = objectStore.add({ id: 0, workday: newWorkday });
+    request.onerror = function(event) {
+      console.error("Request error: " + event.target.error.message);
+      reject("Request error: " + event.target.error.message);
+    };
+    request.onsuccess = function() {
+      console.log("Request success");
+      resolve();
+    };
+  });
 }

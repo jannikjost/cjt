@@ -1,4 +1,6 @@
 import { v4 } from "uuid";
+import { updateWorkday } from "./../../api/db";
+
 //TODO save data in indexedDb
 const moduleWorktimeTracker = {
   state: () => ({
@@ -128,6 +130,7 @@ const moduleWorktimeTracker = {
       return new Promise((resolve, reject) => {
         context.commit("renameTask", props);
         //TODO sync with db
+        updateWorkday(context.state.workday);
         resolve();
         reject();
       });
