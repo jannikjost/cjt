@@ -8,7 +8,7 @@
     />
     <el-time-picker
       v-model="stopDate"
-      placeholder="Start time"
+      placeholder="Stop time"
       @change="timeChanged"
       :format="'HH:mm'"
     />
