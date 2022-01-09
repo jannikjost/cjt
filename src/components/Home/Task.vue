@@ -1,5 +1,5 @@
 <template>
-  <el-collapse-item>
+  <el-collapse-item class="task">
     <template #title>
       <el-input
         class="task__title"
@@ -7,7 +7,9 @@
         @change="Debounce(SyncTaskName($event), 250)"
       />
       <label>{{ formattedTime }}</label>
-      <el-button type="danger" @click="RemoveTask">x</el-button>
+      <div class="task__delete">
+        <el-button type="danger" size="small" @click="RemoveTask">x</el-button>
+      </div>
     </template>
     <div>
       <Time
@@ -134,7 +136,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.task {
+  margin-bottom: 14px;
+}
 .task__title {
   width: 100px;
+  margin-right: 14px;
+}
+.task__delete {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-right: 14px;
 }
 </style>

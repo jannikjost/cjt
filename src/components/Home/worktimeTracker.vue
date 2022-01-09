@@ -3,8 +3,8 @@
     <el-collapse class="tasks">
       <Task v-for="task in storeTasks" :key="task.id" :id="task.id" />
     </el-collapse>
-    <el-button @click="addNewTask">Add new Task</el-button>
     <div class="summary">
+      <el-button @click="addNewTask">Add new Task</el-button>
       <el-progress
         :stroke-width="20"
         :color="customColorMethod"
@@ -108,12 +108,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.task__title {
-  width: 100px;
+.tasks {
+  margin-bottom: 14px;
 }
-.task {
-  display: flex;
-  flex-direction: row;
+.summary > * {
+  margin-bottom: 14px;
 }
 .feierabend__container {
   display: flex;
