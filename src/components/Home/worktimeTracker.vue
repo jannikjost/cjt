@@ -17,7 +17,7 @@
           <div>Feierabend</div>
           <img
             class="beer"
-            :class="{ beerAnimation: isFeierabend }"
+            :class="{ beerAnimation: isFeierabendAnimation }"
             src="../../assets/beer.svg"
           /></div
       ></el-button>
@@ -35,9 +35,10 @@ export default {
   components: { Task },
   setup() {
     const store = useStore();
-    const isFeierabend = ref(false);
+    const isFeierabendAnimation = ref(false);
 
     onMounted(() => {
+      store.dispatch("loadWorkday");
       if (store.state.moduleWorktimeTracker.workday.tasks.length) return;
       addNewTask();
     });
@@ -79,12 +80,12 @@ export default {
 
     function feierabend() {
       //TODO show overview of day
-      isFeierabend.value = true;
+      isFeierabendAnimation.value = true;
       store.dispatch("finishWorkDay");
 
       //wait for animation to finish
       setTimeout(function() {
-        isFeierabend.value = false;
+        isFeierabendAnimation.value = false;
       }, 300);
     }
 
@@ -92,7 +93,7 @@ export default {
       //data
       percentage,
       workdayFinished,
-      isFeierabend,
+      isFeierabendAnimation,
       //computed
       workTime,
       storeTasks,

@@ -4,7 +4,7 @@ const objectStoreName = "overtime";
 let db;
 //TODO data in store, or send event when data changes?
 //TODO data sorting, newest should be on top
-export { createDataBase, addEntry, getData, updateWorkday };
+export { createDataBase, addEntry, getData, getWorkday, updateWorkday };
 
 function createDataBase() {
   return new Promise((resolve, reject) => {
@@ -104,7 +104,11 @@ function updateWorkday(newWorkday) {
   return new Promise(function(resolve, reject) {
     const transaction = createTransaction("readwrite");
     const objectStore = transaction.objectStore("workday");
-    var request = objectStore.add({ id: 0, workday: newWorkday });
+    //TODO only update dont add
+    var request = objectStore.add({
+      id: 0,
+      workday: JSON.stringify(newWorkday),
+    });
     request.onerror = function(event) {
       console.error("Request error: " + event.target.error.message);
       reject("Request error: " + event.target.error.message);
@@ -112,6 +116,21 @@ function updateWorkday(newWorkday) {
     request.onsuccess = function() {
       console.log("Request success");
       resolve();
+    };
+  });
+}
+
+function getWorkday() {
+  return new Promise(function(resolve, reject) {
+    const transaction = createTransaction();
+    const objectStore = transaction.objectStore("workday");
+    var request = objectStore.getAll();
+    request.onsuccess = function(event) {
+      //only one workday entry exists
+      resolve(event.target.result[0]);
+    };
+    request.onerror = function(event) {
+      reject(event.target.errorCode);
     };
   });
 }

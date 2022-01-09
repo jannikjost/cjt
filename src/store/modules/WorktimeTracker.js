@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { updateWorkday } from "./../../api/db";
+import { getWorkday, updateWorkday } from "./../../api/db";
 
 //TODO save data in indexedDb
 const moduleWorktimeTracker = {
@@ -23,6 +23,9 @@ const moduleWorktimeTracker = {
     },
   },
   mutations: {
+    setWorkday(state, workday) {
+      state.workday = workday;
+    },
     addNewTask(state) {
       state.workday.tasks.push({
         id: v4(),
@@ -118,6 +121,17 @@ const moduleWorktimeTracker = {
     },
   },
   actions: {
+    async loadWorkday(context) {
+      try {
+        //TODO need way to delete workday
+        const savedWorkday = await getWorkday();
+        if (!savedWorkday) return;
+        const parsedWorkday = JSON.parse(savedWorkday.workday);
+        context.commit("setWorkday", parsedWorkday);
+      } catch {
+        return;
+      }
+    },
     async addNewTask(context) {
       context.commit("addNewTask");
       return new Promise((resolve, reject) => {
@@ -126,14 +140,10 @@ const moduleWorktimeTracker = {
         reject();
       });
     },
-    changeTaskName(context, props) {
-      return new Promise((resolve, reject) => {
-        context.commit("renameTask", props);
-        //TODO sync with db
-        updateWorkday(context.state.workday);
-        resolve();
-        reject();
-      });
+    async changeTaskName(context, props) {
+      context.commit("renameTask", props);
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
     startWorkTime(context, prop) {
       context.commit("startStopWorkDay", prop);
