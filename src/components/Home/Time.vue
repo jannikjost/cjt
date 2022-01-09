@@ -36,7 +36,7 @@ export default {
     const buttonText = computed(() => {
       if (startDate.value && stopDate.value) {
         //TODO button state
-        return "nothing";
+        return "stop again";
       }
       if (startDate.value) {
         return "stop";

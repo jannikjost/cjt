@@ -126,66 +126,75 @@ const moduleWorktimeTracker = {
         //TODO need way to delete workday
         const savedWorkday = await getWorkday();
         if (!savedWorkday) return;
-        const parsedWorkday = JSON.parse(savedWorkday.workday);
+        let parsedWorkday = JSON.parse(savedWorkday.workday);
+        //convert dates to Date objects
+        parsedWorkday.tasks = parsedWorkday.tasks.map((task) => {
+          task.times = task.times.map((time) => {
+            if (time.startTime) time.startTime = new Date(time.startTime);
+            if (time.stopTime) time.stopTime = new Date(time.stopTime);
+            return time;
+          });
+          return task;
+        });
         context.commit("setWorkday", parsedWorkday);
       } catch {
-        return;
+        throw new Error();
       }
     },
     async addNewTask(context) {
       context.commit("addNewTask");
-      return new Promise((resolve, reject) => {
-        //TODO sync with db
-        resolve();
-        reject();
-      });
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
     async changeTaskName(context, props) {
       context.commit("renameTask", props);
       //TODO exception handling
       return await updateWorkday(context.state.workday);
     },
-    startWorkTime(context, prop) {
+    async startWorkTime(context, prop) {
       context.commit("startStopWorkDay", prop);
       context.commit("setStartTime", {
         taskId: prop.taskId,
         taskTimeId: prop.taskTimeId,
         startTime: prop.startTime,
       });
-      //TODO sync with db
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
-    finishWorkDay(context) {
+    async finishWorkDay(context) {
       //TODO implement
       context.commit("calculateWorktime");
-      //TODO sync with db
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
-    stopTaskWorkTime(context, props) {
-      return new Promise((resolve, reject) => {
-        context.commit("stopWorkTime", props);
-        context.commit("calculateWorktime");
-        context.commit("startStopWorkDay", false);
-        context.commit("addNewTaskTime", props.taskId);
-        //TODO sync with db
-        resolve();
-        reject();
-      });
+    async stopTaskWorkTime(context, props) {
+      context.commit("stopWorkTime", props);
+      context.commit("calculateWorktime");
+      context.commit("startStopWorkDay", false);
+      context.commit("addNewTaskTime", props.taskId);
+
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
-    removeTaskWorkTime(context, props) {
+    async removeTaskWorkTime(context, props) {
       const task = context.getters.getTaskById(props.taskId);
       if (task.times.length > 1) {
         context.commit("removeTaskWorkTime", props);
       } else {
         context.commit("resetTaskWorkTime", props);
       }
-      //TODO sync with db
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
-    removeTask(context, id) {
+    async removeTask(context, id) {
       context.commit("removeTask", id);
-      //TODO sync with db
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
-    resetTask(context, id) {
+    async resetTask(context, id) {
       context.commit("resetTask", id);
-      //TODO sync with db
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
     },
   },
 };

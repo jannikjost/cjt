@@ -37,8 +37,12 @@ export default {
     const store = useStore();
     const isFeierabendAnimation = ref(false);
 
-    onMounted(() => {
-      store.dispatch("loadWorkday");
+    onMounted(async () => {
+      try {
+        await store.dispatch("loadWorkday");
+      } catch {
+        //TODO error message "reading old workday went wrong"
+      }
       if (store.state.moduleWorktimeTracker.workday.tasks.length) return;
       addNewTask();
     });

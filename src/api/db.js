@@ -9,7 +9,7 @@ export { createDataBase, addEntry, getData, getWorkday, updateWorkday };
 function createDataBase() {
   return new Promise((resolve, reject) => {
     if (!window.indexedDB) {
-      console.log(
+      console.error(
         "Your Browser doesn't support a stable version of IndexedDB."
       );
     }
@@ -18,7 +18,7 @@ function createDataBase() {
 
     request.onerror = function() {
       reject();
-      console.log("Why didn't you allow my web app to use IndexedDB?!");
+      console.error("Why didn't you allow my web app to use IndexedDB?!");
     };
     request.onsuccess = function(event) {
       db = event.target.result;
@@ -27,7 +27,7 @@ function createDataBase() {
         // Generic error handler for all errors targeted at this database's
         // requests!
 
-        console.error("Database error: " + event.target.error.message);
+        console.debug("Database error: " + event.target.error.message);
       };
     };
 
@@ -43,7 +43,7 @@ function createDataBase() {
       objectStore.createIndex("date", "date", { unique: true });
       objectStore.createIndex("overtime", "overtime", { unique: false });
       objectStore.transaction.oncomplete = function() {
-        console.log(objectStoreName + " successfully created");
+        console.debug(objectStoreName + " successfully created");
       };
 
       var objectStore2 = db.createObjectStore("workday", {
@@ -52,7 +52,7 @@ function createDataBase() {
       objectStore2.createIndex("id", "id", { unique: true });
       objectStore2.createIndex("workday", "workday", { unique: false });
       objectStore2.transaction.oncomplete = function() {
-        console.log("workday" + " successfully created");
+        console.debug("workday" + " successfully created");
       };
     };
   });
@@ -64,11 +64,11 @@ function addEntry(data) {
     const objectStore = transaction.objectStore(objectStoreName);
     var request = objectStore.add(data);
     request.onerror = function(event) {
-      console.error("Request error: " + event.target.error.message);
+      console.debug("Request error: " + event.target.error.message);
       reject("Request error: " + event.target.error.message);
     };
     request.onsuccess = function() {
-      console.log("Request success");
+      console.debug("Request success");
       resolve();
     };
   });
@@ -91,10 +91,10 @@ function getData() {
 function createTransaction(mode) {
   var transaction = db.transaction([objectStoreName, "workday"], mode);
   transaction.oncomplete = function() {
-    console.log("Transaction done!");
+    console.debug("Transaction done!");
   };
   transaction.onerror = function(event) {
-    console.error("Transaction error: " + event.target.error.message);
+    console.debug("Transaction error: " + event.target.error.message);
   };
 
   return transaction;
@@ -104,17 +104,16 @@ function updateWorkday(newWorkday) {
   return new Promise(function(resolve, reject) {
     const transaction = createTransaction("readwrite");
     const objectStore = transaction.objectStore("workday");
-    //TODO only update dont add
-    var request = objectStore.add({
+    var request = objectStore.put({
       id: 0,
       workday: JSON.stringify(newWorkday),
     });
     request.onerror = function(event) {
-      console.error("Request error: " + event.target.error.message);
+      console.debug("Request error: " + event.target.error.message);
       reject("Request error: " + event.target.error.message);
     };
     request.onsuccess = function() {
-      console.log("Request success");
+      console.debug("Success: Updating workday");
       resolve();
     };
   });
