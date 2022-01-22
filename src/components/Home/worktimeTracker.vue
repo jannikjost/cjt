@@ -24,6 +24,13 @@
       <!-- //TODO implement -->
       <el-button type="danger">Reset all</el-button>
     </div>
+
+    <Dialog
+      v-if="showDialog"
+      :tasks="storeTasks"
+      v-on:cancel="cancelDialog"
+      v-on:confirm="confirmDialog"
+    />
   </div>
 </template>
 
@@ -31,13 +38,15 @@
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import Task from "./Task.vue";
-import { convertMinsToHrsMins } from "./../../services/formatter";
+import Dialog from "./Dialog.vue";
+import { convertMinsToHrsMins } from "../../services/formatter";
 
 export default {
-  components: { Task },
+  components: { Task, Dialog },
   setup() {
     const store = useStore();
     const isFeierabendAnimation = ref(false);
+    const showDialog = ref(false);
 
     onMounted(async () => {
       try {
@@ -85,7 +94,6 @@ export default {
     }
 
     function feierabend() {
-      //TODO show overview of day
       isFeierabendAnimation.value = true;
       store.dispatch("finishWorkDay");
 
@@ -93,6 +101,16 @@ export default {
       setTimeout(function() {
         isFeierabendAnimation.value = false;
       }, 300);
+      showDialog.value = true;
+    }
+
+    function cancelDialog() {
+      showDialog.value = false;
+    }
+
+    function confirmDialog() {
+      showDialog.value = false;
+      //TODO auto add overtime
     }
 
     return {
@@ -100,6 +118,7 @@ export default {
       percentage,
       workdayFinished,
       isFeierabendAnimation,
+      showDialog,
       //computed
       workTime,
       storeTasks,
@@ -108,6 +127,8 @@ export default {
       customColorMethod,
       addNewTask,
       feierabend,
+      cancelDialog,
+      confirmDialog,
     };
   },
 };

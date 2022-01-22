@@ -7,7 +7,7 @@
 
 <script>
 import History from "../components/Overview/History.vue";
-import WorktimeTracker from "../components/Home/worktimeTracker.vue";
+import WorktimeTracker from "../components/Home/WorktimeTracker.vue";
 
 export default {
   name: "Home",
