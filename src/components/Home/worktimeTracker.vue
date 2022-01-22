@@ -21,6 +21,8 @@
             src="../../assets/beer.svg"
           /></div
       ></el-button>
+      <!-- //TODO implement -->
+      <el-button type="danger">Reset all</el-button>
     </div>
   </div>
 </template>

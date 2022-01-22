@@ -92,6 +92,7 @@ const moduleWorktimeTracker = {
       const task = state.workday.tasks.find((el) => el.id === props.taskId);
       task.times.forEach((element, index) => {
         if (element.id === props.taskTimeId) {
+          if (element.time) task.time -= element.time;
           task.times.splice(index, 1);
         }
       });
@@ -99,6 +100,7 @@ const moduleWorktimeTracker = {
     resetTaskWorkTime(state, props) {
       const task = state.workday.tasks.find((el) => el.id === props.taskId);
       const time = task.times.find((el) => el.id === props.taskTimeId);
+      if (time.time) task.time -= time.time;
       delete time.time;
       delete time.startTime;
       delete time.stopTime;
@@ -162,7 +164,6 @@ const moduleWorktimeTracker = {
       return await updateWorkday(context.state.workday);
     },
     async finishWorkDay(context) {
-      //TODO implement
       context.commit("calculateWorktime");
       //TODO exception handling
       return await updateWorkday(context.state.workday);
@@ -183,16 +184,19 @@ const moduleWorktimeTracker = {
       } else {
         context.commit("resetTaskWorkTime", props);
       }
+      context.commit("calculateWorktime");
       //TODO exception handling
       return await updateWorkday(context.state.workday);
     },
     async removeTask(context, id) {
       context.commit("removeTask", id);
+      context.commit("calculateWorktime");
       //TODO exception handling
       return await updateWorkday(context.state.workday);
     },
     async resetTask(context, id) {
       context.commit("resetTask", id);
+      context.commit("calculateWorktime");
       //TODO exception handling
       return await updateWorkday(context.state.workday);
     },
