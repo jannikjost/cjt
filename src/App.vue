@@ -3,8 +3,16 @@
     <!-- navigation -->
     <nav class="nav">
       <div class="nav__element">logo</div>
-      <router-link class="nav__element link" to="/">Home</router-link>
-      <router-link class="nav__element link" to="/overview"
+      <router-link
+        class="nav__element link"
+        :class="{ link__active: isLinkActive('/') }"
+        to="/"
+        >Home</router-link
+      >
+      <router-link
+        class="nav__element link"
+        :class="{ link__active: isLinkActive('/overview') }"
+        to="/overview"
         >Overview</router-link
       >
     </nav>
@@ -21,20 +29,34 @@
 </template>
 
 <script>
+import { useRoute } from "vue-router";
+import { computed } from "vue";
+
 export default {
   name: "App",
   components: {},
   setup() {
+    const route = useRoute();
+
+    const path = computed(() => route.path);
+
     const versionString = "cjt Version 0.1.0";
+
+    function isLinkActive(params) {
+      return path.value === params;
+    }
 
     return {
       versionString,
+      isLinkActive,
     };
   },
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "./styles/element-variables.scss";
+
 html,
 body {
   margin: 0;
@@ -46,24 +68,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #141414;
   height: 100%;
 }
 .app {
-  /* height: calc(100% - 93px); */
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 .nav {
   display: flex;
-  height: 75px;
-  background-color: #a63c86;
-  color: #fff;
   align-items: center;
+  gap: 14px;
+
+  height: 75px;
+  background-color: $--color-primary;
+  color: #fff;
 }
 .nav__element {
-  margin: 0 14px;
   color: #fff;
   font-weight: 700;
 }
@@ -75,19 +97,24 @@ body {
   justify-content: center;
   text-decoration: none;
   transition: all 200ms ease-in-out;
-  border-top: 4px solid #a63c86;
-  border-bottom: 4px solid #a63c86;
+  border-top: 4px solid $--color-primary;
+  border-bottom: 4px solid $--color-primary;
 
   height: 100%;
   width: 100px;
 }
 .link:hover {
-  border-bottom: 4px solid #943578;
-  border-top: 4px solid #fff;
-  background-color: #943578;
+  border-top: 4px solid $--color-primary-dark;
+  border-bottom: 4px solid #fff;
+  background-color: $--color-primary-dark;
 }
 .link:visited {
   color: inherit;
+}
+.link__active {
+  border-bottom: 4px solid $--color-secondary;
+  background-color: $--color-primary-dark;
+  border-top: 4px solid $--color-primary-dark;
 }
 
 .content {
@@ -100,7 +127,7 @@ body {
   align-items: center;
   gap: 12px;
 
-  color: #a63c86;
+  color: $--color-secondary;
   font-size: 12px;
   cursor: default;
 }
