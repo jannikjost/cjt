@@ -1,15 +1,22 @@
 <template>
   <div class="app">
     <!-- navigation -->
-    <div class="nav">
+    <nav class="nav">
       <div class="nav__element">logo</div>
       <router-link class="nav__element link" to="/">Home</router-link>
       <router-link class="nav__element link" to="/overview"
         >Overview</router-link
       >
-    </div>
-    <!-- router links -->
-    <router-view></router-view>
+    </nav>
+    <main class="content">
+      <router-view></router-view>
+    </main>
+    <footer class="footer">
+      <div class="footer__version">{{ versionString }}</div>
+      <a href="https://github.com/jannikjost/cjt/releases" target="_blank"
+        ><img class="github_logo" src="./assets/GitHub-Mark-32px.png"
+      /></a>
+    </footer>
   </div>
 </template>
 
@@ -17,6 +24,13 @@
 export default {
   name: "App",
   components: {},
+  setup() {
+    const versionString = "cjt Version 0.1.0";
+
+    return {
+      versionString,
+    };
+  },
 };
 </script>
 
@@ -40,7 +54,6 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-
 }
 .nav {
   display: flex;
@@ -52,17 +65,49 @@ body {
 .nav__element {
   margin: 0 14px;
   color: #fff;
+  font-weight: 700;
 }
 
 .link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  transition: transform 0.2s; /* Animation */
+  transition: all 200ms ease-in-out;
+  border-top: 4px solid #a63c86;
+  border-bottom: 4px solid #a63c86;
+
+  height: 100%;
+  width: 100px;
 }
 .link:hover {
-  transform: scale(1.5);
-  border-bottom: 1px solid #fff;
+  border-bottom: 4px solid #943578;
+  border-top: 4px solid #fff;
+  background-color: #943578;
 }
 .link:visited {
   color: inherit;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  color: #a63c86;
+  font-size: 12px;
+  cursor: default;
+}
+.footer__version {
+  filter: brightness(75%);
+}
+.github_logo {
+  height: 18px;
 }
 </style>
