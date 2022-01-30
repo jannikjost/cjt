@@ -21,8 +21,7 @@
             src="../../assets/beer.svg"
           /></div
       ></el-button>
-      <!-- //TODO implement -->
-      <el-button type="danger">Reset all</el-button>
+      <el-button type="danger" @click="resetAll">Reset all</el-button>
     </div>
 
     <Dialog
@@ -40,6 +39,7 @@ import { useStore } from "vuex";
 import Task from "./Task.vue";
 import Dialog from "./Dialog.vue";
 import { convertMinsToHrsMins } from "../../services/formatter";
+import { ElMessageBox } from "element-plus";
 
 export default {
   components: { Task, Dialog },
@@ -113,6 +113,18 @@ export default {
       //TODO auto add overtime
     }
 
+    async function resetAll() {
+      await ElMessageBox.confirm(
+        `Are you sure you want to reset all tasks?`,
+        `Confirm Reset`,
+        {
+          confirmButtonText: "OK",
+          cancelButtonText: "Cancel",
+        }
+      );
+      store.dispatch("resetAll");
+    }
+
     return {
       //data
       percentage,
@@ -129,6 +141,7 @@ export default {
       feierabend,
       cancelDialog,
       confirmDialog,
+      resetAll,
     };
   },
 };

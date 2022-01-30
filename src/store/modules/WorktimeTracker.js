@@ -121,6 +121,21 @@ const moduleWorktimeTracker = {
         }
       });
     },
+    resetAll(state) {
+      state.workday = {
+        time: 0,
+        isFinished: true,
+        percentage: 0,
+        tasks: [
+          {
+            id: v4(),
+            name: "",
+            times: [{ id: v4() }],
+            time: 0,
+          },
+        ],
+      };
+    },
   },
   actions: {
     async loadWorkday(context) {
@@ -197,6 +212,11 @@ const moduleWorktimeTracker = {
     async resetTask(context, id) {
       context.commit("resetTask", id);
       context.commit("calculateWorktime");
+      //TODO exception handling
+      return await updateWorkday(context.state.workday);
+    },
+    async resetAll(context) {
+      context.commit("resetAll");
       //TODO exception handling
       return await updateWorkday(context.state.workday);
     },
