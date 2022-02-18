@@ -1,17 +1,18 @@
 <template>
   <div class="home">
-    <el-card><WorktimeTracker /></el-card>
-    <el-card><History /></el-card>
+    <WorktimeTracker />
+    <Card><History /></Card>
   </div>
 </template>
 
 <script>
 import History from "../components/Overview/History.vue";
 import WorktimeTracker from "../components/Home/WorktimeTracker.vue";
+import Card from "../components/Card.vue";
 
 export default {
   name: "Home",
-  components: { History, WorktimeTracker },
+  components: { History, WorktimeTracker, Card },
 };
 </script>
 

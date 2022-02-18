@@ -1,36 +1,41 @@
 <template>
-  <div>
+  <Card class="tracker">
     <el-collapse class="tasks">
       <Task v-for="task in storeTasks" :key="task.id" :id="task.id" />
     </el-collapse>
-    <div class="summary">
-      <el-button @click="addNewTask">Add new Task</el-button>
-      <el-progress
-        :stroke-width="20"
-        :color="customColorMethod"
-        :percentage="percentage"
-        :indeterminate="!workdayFinished"
-        ><span>{{ workTime }}</span></el-progress
-      >
-      <el-button class="feierabend" type="primary" @click="feierabend"
-        ><div class="feierabend__container">
-          <div>Feierabend</div>
-          <img
-            class="beer"
-            :class="{ beerAnimation: isFeierabendAnimation }"
-            src="../../assets/beer.svg"
-          /></div
-      ></el-button>
-      <el-button type="danger" @click="resetAll">Reset all</el-button>
-    </div>
+    <template v-slot:footer>
+      <div class="summary">
+        <el-progress
+          class="progress"
+          :stroke-width="20"
+          :color="customColorMethod"
+          :percentage="percentage"
+          :indeterminate="!workdayFinished"
+          ><span>{{ workTime }}</span></el-progress
+        >
 
+        <div class="btn-group">
+          <el-button type="danger" @click="resetAll">Reset all</el-button>
+          <el-button @click="addNewTask">Add new Task</el-button>
+          <el-button class="feierabend" type="primary" @click="feierabend"
+            ><div class="feierabend__container">
+              <div>Feierabend</div>
+              <img
+                class="beer"
+                :class="{ beerAnimation: isFeierabendAnimation }"
+                src="../../assets/beer.svg"
+              /></div
+          ></el-button>
+        </div>
+      </div>
+    </template>
     <Dialog
       v-if="showDialog"
       :tasks="storeTasks"
       v-on:cancel="cancelDialog"
       v-on:confirm="confirmDialog"
     />
-  </div>
+  </Card>
 </template>
 
 <script>
@@ -40,9 +45,10 @@ import Task from "./Task.vue";
 import Dialog from "./Dialog.vue";
 import { convertMinsToHrsMins } from "../../services/formatter";
 import { ElMessageBox } from "element-plus";
+import Card from "../Card.vue";
 
 export default {
-  components: { Task, Dialog },
+  components: { Task, Dialog, Card },
   setup() {
     const store = useStore();
     const isFeierabendAnimation = ref(false);
@@ -148,11 +154,22 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.tracker {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .tasks {
   margin-bottom: 14px;
+  flex-grow: 1;
 }
-.summary > * {
+.progress {
   margin-bottom: 14px;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: flex-end;
 }
 .feierabend__container {
   display: flex;

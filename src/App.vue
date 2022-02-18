@@ -81,7 +81,7 @@ body {
   align-items: center;
   gap: 14px;
 
-  height: 75px;
+  min-height: 50px;
   background-color: $--color-primary;
   color: #fff;
 }
@@ -130,9 +130,6 @@ body {
   color: $--color-secondary;
   font-size: 12px;
   cursor: default;
-}
-.footer__version {
-  filter: brightness(75%);
 }
 .github_logo {
   height: 18px;
