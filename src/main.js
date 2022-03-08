@@ -3,16 +3,17 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
-import installElementPlus from "./plugins/element";
+import ElementPlus from "element-plus";
+import "element-plus/dist/index.css";
 import { createDataBase } from "./api/db";
 
 createDataBase()
   .then(() => {
     const app = createApp(App);
-    installElementPlus(app);
     app
       .use(store)
       .use(router)
+      .use(ElementPlus)
       .mount("#app");
   })
   .catch(() => {
