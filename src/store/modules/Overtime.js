@@ -25,4 +25,4 @@ async function AddOvertime(overtime) {
   }
 }
 
-export default { getOvertime, LoadOvertime, AddOvertime };
+export { getOvertime, LoadOvertime, AddOvertime };

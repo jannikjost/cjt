@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import { getWorkday, updateWorkday } from "./../../api/db";
 
-import { reactive } from "vue";
+import { reactive, computed } from "vue";
 
 const state = reactive({
   // task = { id: v4(), name: "test", times: [], time: 0 }
@@ -12,6 +12,12 @@ const state = reactive({
     tasks: [],
   },
 });
+
+const hasTasks = computed(() => state.workday.tasks.length > 0);
+const tasks = computed(()=>state.workday.tasks)
+const worktime = computed(()=>state.workday.time);
+const percentage = computed(()=>state.workday.percentage)
+const isFinished = computed(()=> state.workday.isFinished)
 
 function GetTaskById(taskId) {
   return state.workday.tasks.find((el) => el.id === taskId);
@@ -206,7 +212,12 @@ function StopWorkTime(props) {
   task.time = tempTime;
 }
 
-export default {
+export {
+  hasTasks,
+  tasks,
+  worktime,
+  percentage,
+  isFinished,
   GetTaskById,
   GetTaskTimeById,
   LoadWorkday,

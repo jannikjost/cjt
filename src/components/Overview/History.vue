@@ -2,7 +2,7 @@
   <div class="history">
     <div class="table">
       <!-- //TODO add heigth option for Home -->
-      <el-table :data="storeOvertimeData" style="width: 100%" height="400px">
+      <el-table :data="getOvertime" style="width: 100%" height="400px">
         <el-table-column prop="date" label="Date">
           <template #default="scope">
             <i class="el-icon-time"></i>
@@ -45,12 +45,11 @@ import {
   formatOvertime,
   formatDateDayMonthYear,
 } from "./../../services/formatter";
-import { useStore } from "vuex";
 import { ElMessageBox, ElMessage } from "element-plus";
+import { getOvertime, LoadOvertime } from "@/store/modules/Overtime";
 
 export default {
   setup() {
-    const store = useStore();
     const date = ref(new Date());
     const overtime = ref(0);
     const shortcuts = [
@@ -70,11 +69,7 @@ export default {
 
     onMounted(async () => {
       //? load store in overview
-      store.dispatch("loadData");
-    });
-
-    const storeOvertimeData = computed(() => {
-      return store.state.moduleOvertime.overtime;
+      LoadOvertime();
     });
 
     async function addOvertime() {
@@ -84,7 +79,7 @@ export default {
       if (date.value && overtime.value) {
         // check if entry for given date already exists
         if (
-          store.state.moduleOvertime.overtime.filter((el) => {
+          getOvertime.filter((el) => {
             return el.date.getTime() === date.value.getTime();
           }).length
         ) {
@@ -117,8 +112,8 @@ export default {
 
     //TODO sort after adding value in cause older date gets entered, prob in store
     async function addEntry() {
-      const newOvertime = store.state.moduleOvertime.overtime.length
-        ? store.state.moduleOvertime.overtime[0].overtime + overtime.value
+      const newOvertime = getOvertime.length
+        ? getOvertime[0].overtime + overtime.value
         : overtime.value;
       const overtimeObject = {
         date: date.value,
@@ -171,7 +166,7 @@ export default {
       shortcuts,
 
       //computed
-      storeOvertimeData,
+      getOvertime,
 
       //functions
       addOvertime,

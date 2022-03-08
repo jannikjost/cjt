@@ -1,7 +1,7 @@
 <template>
   <Card class="tracker">
     <el-collapse class="tasks">
-      <Task v-for="task in storeTasks" :key="task.id" :id="task.id" />
+      <Task v-for="task in tasks" :key="task.id" :id="task.id" />
     </el-collapse>
     <template v-slot:footer>
       <div class="summary">
@@ -10,8 +10,8 @@
           :stroke-width="20"
           :color="customColorMethod"
           :percentage="percentage"
-          :indeterminate="!workdayFinished"
-          ><span>{{ workTime }}</span></el-progress
+          :indeterminate="!isFinished"
+          ><span>{{ convertedWorkTime }}</span></el-progress
         >
 
         <div class="btn-group">
@@ -31,7 +31,7 @@
     </template>
     <Dialog
       v-if="showDialog"
-      :tasks="storeTasks"
+      :tasks="tasks"
       v-on:cancel="cancelDialog"
       v-on:confirm="confirmDialog"
     />
@@ -40,55 +40,46 @@
 
 <script>
 import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
 import Task from "./Task.vue";
 import Dialog from "./Dialog.vue";
 import { convertMinsToHrsMins } from "../../services/formatter";
 import { ElMessageBox } from "element-plus";
 import Card from "../Card.vue";
+import {
+  hasTasks,
+  LoadWorkday,
+  tasks,
+  worktime,
+  percentage,
+  isFinished,
+} from "@/store/modules/WorktimeTracker.js";
 
 export default {
   components: { Task, Dialog, Card },
   setup() {
-    const store = useStore();
     const isFeierabendAnimation = ref(false);
     const showDialog = ref(false);
 
     onMounted(async () => {
       try {
-        await store.dispatch("loadWorkday");
+        await LoadWorkday();
       } catch {
         //TODO error message "reading old workday went wrong"
       }
-      if (store.state.moduleWorktimeTracker.workday.tasks.length) return;
+      if (hasTasks) return;
       addNewTask();
     });
 
-    const workTime = computed(() => {
-      return convertMinsToHrsMins(storeWorktime.value);
-    });
-
-    const storeTasks = computed(() => {
-      return store.state.moduleWorktimeTracker.workday.tasks;
-    });
-    //TODO its all fucked
-    const storeWorktime = computed(() => {
-      return store.state.moduleWorktimeTracker.workday.time;
-    });
-
-    const percentage = computed(() => {
-      return store.state.moduleWorktimeTracker.workday.percentage;
-    });
-
-    const workdayFinished = computed(() => {
-      return store.state.moduleWorktimeTracker.workday.isFinished;
+    //TODO why not convert in store?
+    const convertedWorkTime = computed(() => {
+      return convertMinsToHrsMins(worktime);
     });
 
     const customColorMethod = (percentage) => {
-      if (workdayFinished.value && percentage < 100) {
+      if (isFinished && percentage < 100) {
         return "#fc0a0a";
       }
-      if (workdayFinished.value && percentage >= 100) {
+      if (isFinished && percentage >= 100) {
         return "#67c23a";
       }
 
@@ -104,7 +95,7 @@ export default {
       store.dispatch("finishWorkDay");
 
       //wait for animation to finish
-      setTimeout(function() {
+      setTimeout(function () {
         isFeierabendAnimation.value = false;
       }, 300);
       showDialog.value = true;
@@ -133,14 +124,13 @@ export default {
 
     return {
       //data
-      percentage,
-      workdayFinished,
       isFeierabendAnimation,
       showDialog,
       //computed
-      workTime,
-      storeTasks,
-      storeWorktime,
+      tasks,
+      convertedWorkTime,
+      percentage,
+      isFinished,
       //functions
       customColorMethod,
       addNewTask,

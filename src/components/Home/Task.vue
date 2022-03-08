@@ -28,32 +28,34 @@
 
 <script>
 import { computed } from "vue";
-import { useStore } from "vuex";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { convertMinsToHrsMins } from "./../../services/formatter";
+import {
+  GetTaskById,
+  StartWorkTime,
+  ChangeTaskName,
+} from "@/store/modules/WorktimeTracker.js";
 
 export default {
   components: { Time },
   props: { id: String },
   setup(props) {
-    const store = useStore();
-
     const formattedTime = computed(() => {
       return convertMinsToHrsMins(storeTask.value.time);
     });
 
     const storeTask = computed(() => {
-      return store.getters.getTaskById(props.id);
+      return GetTaskById(props.id);
     });
 
     const storeTaskTimes = computed(() => {
-      return store.getters.getTaskById(props.id).times;
+      return GetTaskById(props.id).times;
     });
 
     function StartTaskWorkTime(params) {
-      store.dispatch("startWorkTime", {
+      StartWorkTime({
         taskId: props.id,
         taskTimeId: params.id,
         startTime: params.startTime,
@@ -75,7 +77,7 @@ export default {
     }
     async function SyncTaskName(newName) {
       try {
-        await store.dispatch("changeTaskName", {
+        ChangeTaskName({
           id: storeTask.value.id,
           newName,
         });
