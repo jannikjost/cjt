@@ -46,7 +46,7 @@ import {
   formatDateDayMonthYear,
 } from "./../../services/formatter";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { getOvertime, LoadOvertime } from "@/store/modules/Overtime";
+import { getOvertime, LoadOvertime, AddOvertime } from "@/store/modules/Overtime";
 
 export default {
   setup() {
@@ -79,7 +79,7 @@ export default {
       if (date.value && overtime.value) {
         // check if entry for given date already exists
         if (
-          getOvertime.filter((el) => {
+          getOvertime.value.filter((el) => {
             return el.date.getTime() === date.value.getTime();
           }).length
         ) {
@@ -112,15 +112,15 @@ export default {
 
     //TODO sort after adding value in cause older date gets entered, prob in store
     async function addEntry() {
-      const newOvertime = getOvertime.length
-        ? getOvertime[0].overtime + overtime.value
+      const newOvertime = getOvertime.value.length
+        ? getOvertime.value[0].overtime + overtime.value
         : overtime.value;
       const overtimeObject = {
         date: date.value,
         overtime: newOvertime,
       };
       try {
-        await store.dispatch("addOvertime", overtimeObject);
+        await AddOvertime(overtimeObject)
         ElMessage({
           type: "success",
           message: "Add Overtime completed",

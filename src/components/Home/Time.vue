@@ -35,8 +35,7 @@ export default {
 
     const buttonText = computed(() => {
       if (startDate.value && stopDate.value) {
-        //TODO button state
-        return "stop again";
+        return "new";
       }
       if (startDate.value) {
         return "stop";
@@ -45,6 +44,7 @@ export default {
     });
 
     function startStopWorktime() {
+      //TODO handle new
       if (startDate.value) {
         stopDate.value = new Date();
         emit("stopworktime", {

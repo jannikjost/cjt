@@ -8,16 +8,18 @@
       />
       <label>{{ formattedTime }}</label>
       <div class="task__delete">
-        <el-button type="danger" size="small" @click="RemoveTask">x</el-button>
+        <el-button type="danger" size="small" @click="RemoveTaskClick"
+          >x</el-button
+        >
       </div>
     </template>
     <div>
       <Time
         v-for="time in storeTaskTimes"
         :key="time.id"
-        v-on:startworktime="StartTaskWorkTime"
-        v-on:stopworktime="StopTaskWorkTime"
-        v-on:removeworktime="RemoveWorkTime"
+        v-on:startworktime="HandleStartTaskWorkTime"
+        v-on:stopworktime="HandleStopTaskWorkTime"
+        v-on:removeworktime="HandleRemoveWorkTime"
         :id="time.id"
         :startTime2="time.startTime"
         :stopTime2="time.stopTime"
@@ -33,9 +35,14 @@ import Debounce from "./../../utils/debounce";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { convertMinsToHrsMins } from "./../../services/formatter";
 import {
+  tasks,
   GetTaskById,
   StartWorkTime,
   ChangeTaskName,
+  StopTaskWorkTime,
+  RemoveTaskWorkTime,
+  RemoveTask,
+  ResetTask
 } from "@/store/modules/WorktimeTracker.js";
 
 export default {
@@ -54,23 +61,23 @@ export default {
       return GetTaskById(props.id).times;
     });
 
-    function StartTaskWorkTime(params) {
+    function HandleStartTaskWorkTime(params) {
       StartWorkTime({
         taskId: props.id,
         taskTimeId: params.id,
         startTime: params.startTime,
       });
     }
-    function StopTaskWorkTime(params) {
-      store.dispatch("stopTaskWorkTime", {
+    function HandleStopTaskWorkTime(params) {
+      StopTaskWorkTime({
         taskId: props.id,
         taskTimeId: params.id,
         stopTime: params.stopTime,
         time: params.time,
       });
     }
-    function RemoveWorkTime(param) {
-      store.dispatch("removeTaskWorkTime", {
+    function HandleRemoveWorkTime(param) {
+      RemoveTaskWorkTime({
         taskId: props.id,
         taskTimeId: param.id,
       });
@@ -90,9 +97,8 @@ export default {
       }
     }
 
-    async function RemoveTask() {
-      const moreThanOneTask =
-        store.state.moduleWorktimeTracker.workday.tasks.length > 1;
+    async function RemoveTaskClick() {
+      const moreThanOneTask = tasks.value.length > 1;
       const text = moreThanOneTask ? "delete" : "reset";
       try {
         await ElMessageBox.confirm(
@@ -104,9 +110,9 @@ export default {
           }
         );
         if (moreThanOneTask) {
-          store.dispatch("removeTask", props.id);
+          RemoveTask(props.id);
         } else {
-          store.dispatch("resetTask", props.id);
+          ResetTask(props.id)
         }
         ElMessage({
           type: "success",
@@ -126,12 +132,12 @@ export default {
       storeTask,
       storeTaskTimes,
       //functions
-      StartTaskWorkTime,
-      StopTaskWorkTime,
-      RemoveWorkTime,
+      HandleStartTaskWorkTime,
+      HandleStopTaskWorkTime,
+      HandleRemoveWorkTime,
       SyncTaskName,
       Debounce,
-      RemoveTask,
+      RemoveTaskClick,
     };
   },
 };

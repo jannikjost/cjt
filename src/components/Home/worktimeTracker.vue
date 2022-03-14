@@ -16,7 +16,7 @@
 
         <div class="btn-group">
           <el-button type="danger" @click="resetAll">Reset all</el-button>
-          <el-button @click="addNewTask">Add new Task</el-button>
+          <el-button @click="AddNewTask">Add new Task</el-button>
           <el-button class="feierabend" type="primary" @click="feierabend"
             ><div class="feierabend__container">
               <div>Feierabend</div>
@@ -52,6 +52,9 @@ import {
   worktime,
   percentage,
   isFinished,
+  AddNewTask,
+  FinishWorkDay,
+  ResetAll
 } from "@/store/modules/WorktimeTracker.js";
 
 export default {
@@ -66,39 +69,36 @@ export default {
       } catch {
         //TODO error message "reading old workday went wrong"
       }
-      if (hasTasks) return;
-      addNewTask();
+      if (hasTasks.value) return;
+      AddNewTask();
     });
 
     //TODO why not convert in store?
     const convertedWorkTime = computed(() => {
-      return convertMinsToHrsMins(worktime);
+      return convertMinsToHrsMins(worktime.value);
     });
 
     const customColorMethod = (percentage) => {
-      if (isFinished && percentage < 100) {
+      if (isFinished.value && percentage < 100) {
         return "#fc0a0a";
       }
-      if (isFinished && percentage >= 100) {
+      if (isFinished.value && percentage >= 100) {
         return "#67c23a";
       }
 
       return "#F39221";
     };
 
-    function addNewTask() {
-      store.dispatch("addNewTask");
-    }
-
     function feierabend() {
       isFeierabendAnimation.value = true;
-      store.dispatch("finishWorkDay");
+      FinishWorkDay()
 
       //wait for animation to finish
       setTimeout(function () {
         isFeierabendAnimation.value = false;
       }, 300);
-      showDialog.value = true;
+      //TODO enable for 1.0
+      // showDialog.value = true;
     }
 
     function cancelDialog() {
@@ -119,7 +119,7 @@ export default {
           cancelButtonText: "Cancel",
         }
       );
-      store.dispatch("resetAll");
+     ResetAll()
     }
 
     return {
@@ -133,8 +133,8 @@ export default {
       isFinished,
       //functions
       customColorMethod,
-      addNewTask,
       feierabend,
+      AddNewTask,
       cancelDialog,
       confirmDialog,
       resetAll,

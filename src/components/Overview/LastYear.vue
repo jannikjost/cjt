@@ -30,33 +30,31 @@ import {
   formatOvertime,
   formatDateMonthYear,
 } from "./../../services/formatter";
-import { useStore } from "vuex";
+import { getOvertime, LoadOvertime } from "@/store/modules/Overtime.js";
 
 export default {
   //TODO rename to overtime by months
   setup() {
-    const store = useStore();
-
     onMounted(async () => {
       //? load store in overview
-      store.dispatch("loadData");
+      LoadOvertime();
     });
 
     const storeOvertimeData = computed(() => {
-      return formatOvertimeDate(store.state.moduleOvertime.overtime);
+      return formatOvertimeDate(getOvertime.value);
     });
 
     const year = computed(() => {
-      if (store.state.moduleOvertime.overtime.length) {
+      if (getOvertime.value.length) {
         //? what happens if only one month is in db
         return (
           formatDateMonthYear(
-            store.state.moduleOvertime.overtime[
-              store.state.moduleOvertime.overtime.length - 1
+            getOvertime.value[
+              getOvertime.value.length - 1
             ].date
           ) +
           " - " +
-          formatDateMonthYear(store.state.moduleOvertime.overtime[0].date)
+          formatDateMonthYear(getOvertime.value[0].date)
         );
       }
       return "";

@@ -82,7 +82,7 @@ async function StartWorkTime(prop) {
   const time = task.times.find((el) => el.id === prop.taskTimeId);
   time.startTime = prop.startTime;
   //TODO exception handling
-  return await updateWorkday(context.state.workday);
+  return await updateWorkday(state.workday);
 }
 
 function StartStopWorkDay(prop) {
@@ -185,12 +185,6 @@ async function StopTaskWorkTime(props) {
   //? already syncs, call at end
   CalculateWorktime();
   StartStopWorkDay(false);
-  const task = state.workday.tasks.find((el) => el.id === taskId);
-  if (task.times.at(-1).startTime) {
-    task.times.push({
-      id: v4(),
-    });
-  }
 
   //TODO exception handling
   return await updateWorkday(state.workday);
