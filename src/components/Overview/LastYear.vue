@@ -1,7 +1,7 @@
 <template>
   <div class="lastYear">
     <p>{{ year }}</p>
-    <el-table :data="storeOvertimeData" style="width: 100%">
+    <el-table :data="storeOvertimeData" style="width: 100%" height="400px">
       <el-table-column prop="date" label="Month">
         <template #default="scope">
           <i class="el-icon-time"></i>
@@ -48,13 +48,11 @@ export default {
       if (getOvertime.value.length) {
         //? what happens if only one month is in db
         return (
-          formatDateMonthYear(
-            getOvertime.value[
-              getOvertime.value.length - 1
-            ].date
-          ) +
+          formatDateMonthYear(getOvertime.value[0].date) +
           " - " +
-          formatDateMonthYear(getOvertime.value[0].date)
+          formatDateMonthYear(
+            getOvertime.value[getOvertime.value.length - 1].date
+          )
         );
       }
       return "";
@@ -62,7 +60,7 @@ export default {
 
     function formatOvertimeDate(data) {
       data.sort((a, b) => {
-        return b.date - a.date;
+        return a.date - b.date;
       });
       const monthlyOverview = [];
       let index = -1;
@@ -83,11 +81,14 @@ export default {
           //calculate the overtime made the previous month
           const lastMonth = monthlyOverview[index - 1];
           if (lastMonth) {
-            lastMonth.overtimeThisMonth -= el.overtime;
+            monthlyOverview[index].overtime += lastMonth.overtime;
           }
+        } else {
+          monthlyOverview[index].overtime += el.overtime;
+          monthlyOverview[index].overtimeThisMonth += el.overtime;
         }
       });
-      return monthlyOverview;
+      return monthlyOverview.reverse();
     }
 
     return {
