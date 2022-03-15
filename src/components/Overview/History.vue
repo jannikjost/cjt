@@ -5,20 +5,21 @@
       <el-table :data="getOvertime" style="width: 100%" height="400px">
         <el-table-column prop="date" label="Date">
           <template #default="scope">
-            <i class="el-icon-time"></i>
-            <span style="margin-left: 10px">{{
-              formatDateDayMonthYear(scope.row.date)
-            }}</span>
+            <span>{{ formatDateDayMonthYear(scope.row.date) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="minutes" label="Minutes">
           <template #default="scope">
-            <span>{{ formatOvertime(scope.row.overtime) }}</span>
+            <span :class="{ negative: scope.row.minutes < 0 }">{{
+              formatOvertime(scope.row.minutes)
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="overtime" label="Overtime">
           <template #default="scope">
-            <span>{{ formatOvertime(scope.row.overtime) }}</span>
+            <span :class="{ negative: scope.row.overtime < 0 }">{{
+              formatOvertime(scope.row.overtime)
+            }}</span>
           </template>
         </el-table-column>
       </el-table>
@@ -40,13 +41,17 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import {
   formatOvertime,
   formatDateDayMonthYear,
 } from "./../../services/formatter";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { getOvertime, LoadOvertime, AddOvertime } from "@/store/modules/Overtime";
+import {
+  getOvertime,
+  LoadOvertime,
+  AddOvertime,
+} from "@/store/modules/Overtime";
 
 export default {
   setup() {
@@ -110,17 +115,14 @@ export default {
       }
     }
 
-    //TODO sort after adding value in cause older date gets entered, prob in store
     async function addEntry() {
-      const newOvertime = getOvertime.value.length
-        ? getOvertime.value[0].overtime + overtime.value
-        : overtime.value;
       const overtimeObject = {
         date: date.value,
-        overtime: newOvertime,
+        minutes: overtime.value,
+        overtime: overtime.value,
       };
       try {
-        await AddOvertime(overtimeObject)
+        await AddOvertime(overtimeObject);
         ElMessage({
           type: "success",
           message: "Add Overtime completed",
@@ -194,5 +196,9 @@ export default {
 
 .el-input {
   width: 10%;
+}
+
+.negative {
+  color: red;
 }
 </style>

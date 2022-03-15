@@ -20,6 +20,9 @@ async function AddOvertime(overtime) {
   try {
     await addEntry(overtime);
     state.overtime.unshift(overtime);
+    res.sort((a, b) => {
+      return b.date - a.date;
+    });
   } catch {
     console.error("Adding overtime went wrong");
   }

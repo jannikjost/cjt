@@ -41,18 +41,18 @@ export default {
     });
 
     const storeOvertimeData = computed(() => {
-      return formatOvertimeDate(getOvertime.value);
+      return formatOvertimeDate([...getOvertime.value]);
     });
 
     const year = computed(() => {
       if (getOvertime.value.length) {
         //? what happens if only one month is in db
         return (
-          formatDateMonthYear(getOvertime.value[0].date) +
-          " - " +
           formatDateMonthYear(
             getOvertime.value[getOvertime.value.length - 1].date
-          )
+          ) +
+          " - " +
+          formatDateMonthYear(getOvertime.value[0].date)
         );
       }
       return "";
