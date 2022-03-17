@@ -17,9 +17,9 @@
       <Time
         v-for="time in storeTaskTimes"
         :key="time.id"
-        v-on:startworktime="HandleStartTaskWorkTime"
-        v-on:stopworktime="HandleStopTaskWorkTime"
         v-on:removeworktime="HandleRemoveWorkTime"
+        v-on:addworktime="HandleAddWorkTime"
+        :taskId="id"
         :id="time.id"
         :startTime2="time.startTime"
         :stopTime2="time.stopTime"
@@ -37,13 +37,11 @@ import { convertMinsToHrsMins } from "./../../services/formatter";
 import {
   tasks,
   GetTaskById,
-  StartWorkTime,
+  TimeStore,
   ChangeTaskName,
-  StopTaskWorkTime,
-  RemoveTaskWorkTime,
   RemoveTask,
-  ResetTask
-} from "@/store/modules/WorktimeTracker.js";
+  ResetTask,
+} from "@/store/WorktimeTracker.js";
 
 export default {
   components: { Time },
@@ -61,26 +59,14 @@ export default {
       return GetTaskById(props.id).times;
     });
 
-    function HandleStartTaskWorkTime(params) {
-      StartWorkTime({
-        taskId: props.id,
-        taskTimeId: params.id,
-        startTime: params.startTime,
-      });
-    }
-    function HandleStopTaskWorkTime(params) {
-      StopTaskWorkTime({
-        taskId: props.id,
-        taskTimeId: params.id,
-        stopTime: params.stopTime,
-        time: params.time,
-      });
-    }
     function HandleRemoveWorkTime(param) {
-      RemoveTaskWorkTime({
+      TimeStore.RemoveTime({
         taskId: props.id,
         taskTimeId: param.id,
       });
+    }
+    function HandleAddWorkTime() {
+       TimeStore.AddTime(storeTask.value.id)
     }
     async function SyncTaskName(newName) {
       try {
@@ -93,7 +79,6 @@ export default {
           type: "error",
           message: `Rename of Task "${storeTask.value.name}" was not successful`,
         });
-        //TODO further logging in db
       }
     }
 
@@ -112,7 +97,7 @@ export default {
         if (moreThanOneTask) {
           RemoveTask(props.id);
         } else {
-          ResetTask(props.id)
+          ResetTask(props.id);
         }
         ElMessage({
           type: "success",
@@ -132,9 +117,8 @@ export default {
       storeTask,
       storeTaskTimes,
       //functions
-      HandleStartTaskWorkTime,
-      HandleStopTaskWorkTime,
       HandleRemoveWorkTime,
+      HandleAddWorkTime,
       SyncTaskName,
       Debounce,
       RemoveTaskClick,

@@ -3,35 +3,40 @@
     <el-time-picker
       v-model="startDate"
       placeholder="Start time"
-      @change="timeChanged"
+      @change="StartTimeChange"
       :format="'HH:mm'"
     />
     <el-time-picker
       v-model="stopDate"
       placeholder="Stop time"
-      @change="timeChanged"
+      @change="StopTimeChanged"
       :format="'HH:mm'"
     />
     <el-button @click="startStopWorktime">{{ buttonText }}</el-button>
-    <el-button @click="removeWorkTime" :disabled="!startDate && !stopDate"
-      >x</el-button
-    >
+    <el-button @click="RemoveWorkTime" :disabled="isDisabled">x</el-button>
   </div>
 </template>
 
 <script>
 import { ref, computed } from "vue";
+import { TimeStore } from "../../store/WorktimeTracker";
 
 export default {
   props: {
+    taskId: String,
     id: String,
     startTime2: Object,
     stopTime2: Object,
   },
-  emits: ["removeworktime", "startworktime", "stopworktime"],
+  emits: ["removeworktime", "addworktime"],
   setup(props, { emit }) {
     const startDate = ref(props.startTime2);
     const stopDate = ref(props.stopTime2);
+
+    const isDisabled = computed(() => {
+      // ensure that always at least one time exists
+      return TimeStore.GetTaskByTaskTimeId(props.id).times.length === 1;
+    });
 
     const buttonText = computed(() => {
       if (startDate.value && stopDate.value) {
@@ -44,33 +49,49 @@ export default {
     });
 
     function startStopWorktime() {
-      //TODO handle new
+      if (buttonText.value === "new") {
+        emit("addworktime");
+        return;
+      }
       if (startDate.value) {
         stopDate.value = new Date();
-        emit("stopworktime", {
-          id: props.id,
-          time: calculateTimeDifference(),
+        TimeStore.StopTime({
+          taskId: props.taskId,
+          timeId: props.id,
           stopTime: stopDate.value,
+          time: CalculateTimeDifference(),
         });
         return;
       }
 
       startDate.value = new Date();
-      emit("startworktime", { id: props.id, startTime: startDate.value });
+      TimeStore.StartTime({
+        taskId: props.taskId,
+        timeId: props.id,
+        startTime: startDate.value,
+      });
     }
 
-    //TODO changing startTime does not work, need seperate function
-    function timeChanged() {
-      if (startDate.value && stopDate.value) {
-        emit("stopworktime", {
-          id: props.id,
-          time: calculateTimeDifference(),
+    function StopTimeChanged() {
+        TimeStore.StopTime({
+          taskId: props.taskId,
+          timeId: props.id,
           stopTime: stopDate.value,
+          time: CalculateTimeDifference(),
         });
-      }
     }
 
-    function calculateTimeDifference() {
+    function StartTimeChange() {
+      TimeStore.UpdateStartTime({
+        taskId: props.taskId,
+        timeId: props.id,
+        time: CalculateTimeDifference(),
+        startTime: startDate.value,
+      });
+    }
+
+    function CalculateTimeDifference() {
+      if (!startDate.value || !stopDate.value) return 0;
       const hours = stopDate.value.getHours() - startDate.value.getHours();
       const minutes =
         stopDate.value.getMinutes() - startDate.value.getMinutes();
@@ -79,7 +100,7 @@ export default {
       return minutesDiff;
     }
 
-    function removeWorkTime() {
+    function RemoveWorkTime() {
       //?
       startDate.value = "";
       stopDate.value = "";
@@ -90,10 +111,12 @@ export default {
     return {
       startDate,
       stopDate,
+      isDisabled,
       buttonText,
       startStopWorktime,
-      removeWorkTime,
-      timeChanged,
+      RemoveWorkTime,
+      StartTimeChange,
+      StopTimeChanged,
     };
   },
 };

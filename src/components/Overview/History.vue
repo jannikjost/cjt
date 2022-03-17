@@ -51,7 +51,7 @@ import {
   getOvertime,
   LoadOvertime,
   AddOvertime,
-} from "@/store/modules/Overtime";
+} from "@/store/Overtime";
 
 export default {
   setup() {
