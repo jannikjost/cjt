@@ -30,7 +30,7 @@ import {
   formatOvertime,
   formatDateMonthYear,
 } from "./../../services/formatter";
-import { getOvertime, LoadOvertime } from "@/store/modules/Overtime.js";
+import { getOvertime, LoadOvertime } from "@/store/Overtime.js";
 
 export default {
   //TODO rename to overtime by months

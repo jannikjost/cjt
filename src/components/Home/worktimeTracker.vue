@@ -55,7 +55,7 @@ import {
   AddNewTask,
   FinishWorkDay,
   ResetAll
-} from "@/store/modules/WorktimeTracker.js";
+} from "@/store/WorktimeTracker.js";
 
 export default {
   components: { Task, Dialog, Card },
