@@ -1,4 +1,4 @@
-import { getData, addEntry } from "./../../api/db";
+import { getData, addEntry } from "../api/db";
 
 import { reactive, computed } from "vue";
 
