@@ -17,15 +17,11 @@
         <div class="btn-group">
           <el-button type="danger" @click="resetAll">Reset all</el-button>
           <el-button @click="AddNewTask">Add new Task</el-button>
-          <el-button class="feierabend" type="primary" @click="feierabend"
-            ><div class="feierabend__container">
-              <div>Feierabend</div>
-              <img
-                class="beer"
-                :class="{ beerAnimation: isFeierabendAnimation }"
-                src="../../assets/beer.svg"
-              /></div
-          ></el-button>
+          <el-button
+            class="feierabend"
+            type="primary"
+            @click="Feierabend"
+          >Feierabend</el-button>
         </div>
       </div>
     </template>
@@ -54,13 +50,12 @@ import {
   isFinished,
   AddNewTask,
   FinishWorkDay,
-  ResetAll
+  ResetAll,
 } from "@/store/WorktimeTracker.js";
 
 export default {
   components: { Task, Dialog, Card },
   setup() {
-    const isFeierabendAnimation = ref(false);
     const showDialog = ref(false);
 
     onMounted(async () => {
@@ -89,14 +84,9 @@ export default {
       return "#F39221";
     };
 
-    function feierabend() {
-      isFeierabendAnimation.value = true;
-      FinishWorkDay()
+    function Feierabend() {
+      FinishWorkDay();
 
-      //wait for animation to finish
-      setTimeout(function () {
-        isFeierabendAnimation.value = false;
-      }, 300);
       //TODO enable for 1.0
       // showDialog.value = true;
     }
@@ -119,12 +109,11 @@ export default {
           cancelButtonText: "Cancel",
         }
       );
-     ResetAll()
+      ResetAll();
     }
 
     return {
       //data
-      isFeierabendAnimation,
       showDialog,
       //computed
       tasks,
@@ -133,7 +122,7 @@ export default {
       isFinished,
       //functions
       customColorMethod,
-      feierabend,
+      Feierabend,
       AddNewTask,
       cancelDialog,
       confirmDialog,
@@ -160,42 +149,5 @@ export default {
 .btn-group {
   display: flex;
   justify-content: flex-end;
-}
-.feierabend__container {
-  display: flex;
-  align-items: center;
-}
-.beer {
-  margin-left: 8px;
-  width: 20px;
-}
-.beerAnimation {
-  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-//TODO better animation
-@keyframes shake {
-  10%,
-  90% {
-    transform: translate3d(-1px, 0, 0);
-  }
-
-  20%,
-  80% {
-    transform: translate3d(2px, 0, 0);
-  }
-
-  30%,
-  50%,
-  70% {
-    transform: translate3d(-4px, 0, 0);
-  }
-
-  40%,
-  60% {
-    transform: translate3d(4px, 0, 0);
-  }
 }
 </style>
