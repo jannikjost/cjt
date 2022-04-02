@@ -15,6 +15,12 @@
         to="/overview"
         >Overview</router-link
       >
+       <router-link
+        class="nav__element link"
+        :class="{ link__active: isLinkActive('/settings') }"
+        to="/settings"
+        >Settings</router-link
+      >
     </nav>
     <main class="content">
       <router-view></router-view>
