@@ -3,31 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
-    "element-plus": "^1.0.2-beta.28",
+    "@vitejs/plugin-vue": "^2.3.1",
+    "element-plus": "^2.1.8",
+    "pinia": "^2.0.13",
     "register-service-worker": "^1.7.1",
     "uuid": "^8.3.2",
+    "vite": "^2.9.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-pwa": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0",
+    "eslint": "^8.13.0",
+    "eslint-plugin-vue": "^8.6.0",
     "sass": "^1.27.0",
-    "sass-loader": "^10.0.4",
-    "vue-cli-plugin-element-plus": "~0.0.13"
+    "unplugin-auto-import": "^0.7.0",
+    "unplugin-vue-components": "^0.19.0"
   }
 }

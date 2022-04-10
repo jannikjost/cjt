@@ -4,11 +4,13 @@ import "./registerServiceWorker";
 import router from "./router";
 import installElementPlus from "./plugins/element";
 import { createDataBase } from "./api/db";
+import { createPinia } from "pinia";
 
 createDataBase()
   .then(() => {
     const app = createApp(App);
     installElementPlus(app);
+    app.use(createPinia());
     app.use(router).mount("#app");
   })
   .catch(() => {

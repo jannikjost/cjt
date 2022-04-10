@@ -32,58 +32,53 @@
 import { computed } from "vue";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessageBox } from "element-plus";
 import { convertMinsToHrsMins } from "./../../services/formatter";
+import { useWorkdayStore } from "../../store/WorkdayStore.js";
 import {
-  tasks,
-  GetTaskById,
-  TimeStore,
-  ChangeTaskName,
-  RemoveTask,
-  ResetTask,
-} from "@/store/WorktimeTracker.js";
+  errorNotification,
+  infoNotification,
+  successNotification,
+} from "../../services/notificationService";
 
 export default {
   components: { Time },
   props: { id: String },
   setup(props) {
+    const store = useWorkdayStore();
     const formattedTime = computed(() => {
       return convertMinsToHrsMins(storeTask.value.time);
     });
 
     const storeTask = computed(() => {
-      return GetTaskById(props.id);
+      return store.getTaskById(props.id);
     });
 
     const storeTaskTimes = computed(() => {
-      return GetTaskById(props.id).times;
+      return store.getTaskById(props.id).times;
     });
 
     function HandleRemoveWorkTime(param) {
-      TimeStore.RemoveTime({
+      store.removeTime({
         taskId: props.id,
         taskTimeId: param.id,
       });
     }
     function HandleAddWorkTime() {
-       TimeStore.AddTime(storeTask.value.id)
+      store.addTime(storeTask.value.id);
     }
     async function SyncTaskName(newName) {
       try {
-        ChangeTaskName({
-          id: storeTask.value.id,
-          newName,
-        });
+        store.removeTask(storeTask.value.id, newName);
       } catch {
-        ElMessage({
-          type: "error",
-          message: `Rename of Task "${storeTask.value.name}" was not successful`,
-        });
+        errorNotification(
+          `Rename of Task "${storeTask.value.name}" was not successful`
+        );
       }
     }
 
     async function RemoveTaskClick() {
-      const moreThanOneTask = tasks.value.length > 1;
+      const moreThanOneTask = store.hastMoreThanOneTask;
       const text = moreThanOneTask ? "delete" : "reset";
       try {
         await ElMessageBox.confirm(
@@ -95,19 +90,13 @@ export default {
           }
         );
         if (moreThanOneTask) {
-          RemoveTask(props.id);
+          store.removeTask(props.id);
         } else {
-          ResetTask(props.id);
+          store.resetTask(props.id);
         }
-        ElMessage({
-          type: "success",
-          message: `${text} completed`,
-        });
+        successNotification(`${text} completed`);
       } catch {
-        ElMessage({
-          type: "info",
-          message: `${text} canceled`,
-        });
+        infoNotification(`${text} canceled`);
       }
     }
 

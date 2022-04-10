@@ -24,86 +24,76 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted, computed } from "vue";
 import {
   formatOvertime,
   formatDateMonthYear,
 } from "./../../services/formatter";
-import { getOvertime, LoadOvertime } from "@/store/Overtime.js";
+import { useOvertimeStore } from "../../store/OvertimeStore";
+import { errorNotification } from "../../services/notificationService";
 
-export default {
-  //TODO rename to overtime by months
-  setup() {
-    onMounted(async () => {
-      //? load store in overview
-      LoadOvertime();
-    });
+//TODO rename to overtime by months
+const overtimeStore = useOvertimeStore();
 
-    const storeOvertimeData = computed(() => {
-      return formatOvertimeDate([...getOvertime.value]);
-    });
+onMounted(async () => {
+  try {
+    await overtimeStore.hydrate();
+  } catch {
+    errorNotification("could not load Overtime data");
+  }
+});
 
-    const year = computed(() => {
-      if (getOvertime.value.length) {
-        //? what happens if only one month is in db
-        return (
-          formatDateMonthYear(
-            getOvertime.value[getOvertime.value.length - 1].date
-          ) +
-          " - " +
-          formatDateMonthYear(getOvertime.value[0].date)
-        );
-      }
-      return "";
-    });
+const storeOvertimeData = computed(() => {
+  return formatOvertimeDate([...overtimeStore.overtime]);
+});
 
-    function formatOvertimeDate(data) {
-      data.sort((a, b) => {
-        return a.date - b.date;
-      });
-      const monthlyOverview = [];
-      let index = -1;
-      let currMonth = -1;
-      data.forEach((el) => {
-        const month = el.date.getMonth();
-        if (currMonth !== month) {
-          index++;
-        }
+const year = computed(() => {
+  if (overtimeStore.overtime.length) {
+    //? what happens if only one month is in db
+    return (
+      formatDateMonthYear(
+        overtimeStore.overtime[overtimeStore.overtime.length - 1].date
+      ) +
+      " - " +
+      formatDateMonthYear(overtimeStore.overtime[0].date)
+    );
+  }
+  return "";
+});
 
-        if (!monthlyOverview[index]) {
-          currMonth = month;
-          monthlyOverview[index] = {
-            date: el.date,
-            overtime: el.overtime,
-            overtimeThisMonth: el.overtime,
-          };
-          //calculate the overtime made the previous month
-          const lastMonth = monthlyOverview[index - 1];
-          if (lastMonth) {
-            monthlyOverview[index].overtime += lastMonth.overtime;
-          }
-        } else {
-          monthlyOverview[index].overtime += el.overtime;
-          monthlyOverview[index].overtimeThisMonth += el.overtime;
-        }
-      });
-      return monthlyOverview.reverse();
+function formatOvertimeDate(data) {
+  data.sort((a, b) => {
+    return a.date - b.date;
+  });
+  const monthlyOverview = [];
+  let index = -1;
+  let currMonth = -1;
+  data.forEach((el) => {
+    const month = el.date.getMonth();
+    if (currMonth !== month) {
+      index++;
     }
 
-    return {
-      //data
-      year,
-
-      //computed
-      storeOvertimeData,
-
-      //functions
-      formatOvertime,
-      formatDateMonthYear,
-    };
-  },
-};
+    if (!monthlyOverview[index]) {
+      currMonth = month;
+      monthlyOverview[index] = {
+        date: el.date,
+        overtime: el.overtime,
+        overtimeThisMonth: el.overtime,
+      };
+      //calculate the overtime made the previous month
+      const lastMonth = monthlyOverview[index - 1];
+      if (lastMonth) {
+        monthlyOverview[index].overtime += lastMonth.overtime;
+      }
+    } else {
+      monthlyOverview[index].overtime += el.overtime;
+      monthlyOverview[index].overtimeThisMonth += el.overtime;
+    }
+  });
+  return monthlyOverview.reverse();
+}
 </script>
 
 <style lang="scss" scoped></style>

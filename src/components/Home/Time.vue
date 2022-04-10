@@ -19,7 +19,7 @@
 
 <script>
 import { ref, computed } from "vue";
-import { TimeStore } from "../../store/WorktimeTracker";
+import { useWorkdayStore } from "../../store/WorkdayStore";
 
 export default {
   props: {
@@ -30,12 +30,13 @@ export default {
   },
   emits: ["removeworktime", "addworktime"],
   setup(props, { emit }) {
+    const workdayStore = useWorkdayStore();
     const startDate = ref(props.startTime2);
     const stopDate = ref(props.stopTime2);
 
     const isDisabled = computed(() => {
       // ensure that always at least one time exists
-      return TimeStore.GetTaskByTaskTimeId(props.id).times.length === 1;
+      return workdayStore.getTaskByTimeId(props.id).times.length === 1;
     });
 
     const buttonText = computed(() => {
@@ -55,7 +56,7 @@ export default {
       }
       if (startDate.value) {
         stopDate.value = new Date();
-        TimeStore.StopTime({
+        workdayStore.stopTime({
           taskId: props.taskId,
           timeId: props.id,
           stopTime: stopDate.value,
@@ -65,7 +66,7 @@ export default {
       }
 
       startDate.value = new Date();
-      TimeStore.StartTime({
+      workdayStore.startTime({
         taskId: props.taskId,
         timeId: props.id,
         startTime: startDate.value,
@@ -73,16 +74,16 @@ export default {
     }
 
     function StopTimeChanged() {
-        TimeStore.StopTime({
-          taskId: props.taskId,
-          timeId: props.id,
-          stopTime: stopDate.value,
-          time: CalculateTimeDifference(),
-        });
+      workdayStore.stopTime({
+        taskId: props.taskId,
+        timeId: props.id,
+        stopTime: stopDate.value,
+        time: CalculateTimeDifference(),
+      });
     }
 
     function StartTimeChange() {
-      TimeStore.UpdateStartTime({
+      workdayStore.updateStartTime({
         taskId: props.taskId,
         timeId: props.id,
         time: CalculateTimeDifference(),

@@ -2,7 +2,7 @@
   <div class="history">
     <div class="table">
       <!-- //TODO add heigth option for Home -->
-      <el-table :data="getOvertime" style="width: 100%" height="400px">
+      <el-table :data="overtimeList" style="width: 100%" height="400px">
         <el-table-column prop="date" label="Date">
           <template #default="scope">
             <span>{{ formatDateDayMonthYear(scope.row.date) }}</span>
@@ -40,144 +40,118 @@
   </div>
 </template>
 
-<script>
-import { ref, onMounted } from "vue";
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import { ElMessageBox } from "element-plus";
+import { useOvertimeStore } from "../../store/OvertimeStore";
 import {
   formatOvertime,
   formatDateDayMonthYear,
 } from "./../../services/formatter";
-import { ElMessageBox, ElMessage } from "element-plus";
 import {
-  getOvertime,
-  LoadOvertime,
-  AddOvertime,
-} from "@/store/Overtime";
+  errorNotification,
+  infoNotification,
+  successNotification,
+} from "../../services/notificationService";
 
-export default {
-  setup() {
-    const date = ref(new Date());
-    const overtime = ref(0);
-    const shortcuts = [
-      {
-        text: "Today",
-        value: new Date(),
-      },
-      {
-        text: "Yesterday",
-        value: () => {
-          const date = new Date();
-          date.setTime(date.getTime() - 3600 * 1000 * 24);
-          return date;
-        },
-      },
-    ];
-
-    onMounted(async () => {
-      //? load store in overview
-      LoadOvertime();
-    });
-
-    async function addOvertime() {
-      //TODO sometimes date does not work, select dec.1
-      //TODO selecting passed date does not work
-      //TODO selecting current date also saves time
-      if (date.value && overtime.value) {
-        // check if entry for given date already exists
-        if (
-          getOvertime.value.filter((el) => {
-            return el.date.getTime() === date.value.getTime();
-          }).length
-        ) {
-          //TODO get old overtime
-          try {
-            await ElMessageBox.confirm(
-              `Replace old value: ${overtime.value} with new value: ${overtime.value}?`,
-              `Entry for ${date.value.toLocaleDateString()} already exists`,
-              {
-                confirmButtonText: "OK",
-                cancelButtonText: "Cancel",
-              }
-            );
-            //TODO overwrite entry
-            ElMessage({
-              type: "success",
-              message: "Overwrite completed",
-            });
-          } catch {
-            ElMessage({
-              type: "info",
-              message: "Overwrite canceled",
-            });
-          }
-          return;
-        }
-        addEntry();
-      }
-    }
-
-    async function addEntry() {
-      const overtimeObject = {
-        date: date.value,
-        minutes: overtime.value,
-        overtime: overtime.value,
-      };
-      try {
-        await AddOvertime(overtimeObject);
-        ElMessage({
-          type: "success",
-          message: "Add Overtime completed",
-        });
-      } catch {
-        ElMessage({
-          type: "error",
-          message: "Add Overtime failed",
-        });
-      }
-    }
-
-    //allow user to input hours
-    //TODO input does not always refresh, cause technically value doesnt change
-    function overtimeInputChanged(value) {
-      if (!value) return;
-      const separator = ".";
-      if (value.toString().includes(separator)) {
-        const valueString = value.toString();
-        const hours = valueString.substring(0, valueString.indexOf(separator));
-        const minutes = valueString.substring(
-          valueString.indexOf(separator) + 1,
-          valueString.length
-        );
-
-        const newValue = hours * 60 + Number(minutes === "3" ? 30 : minutes);
-        overtime.value = hours <= 2 && hours >= -8 ? newValue : 0;
-      }
-      //check if value ist between 2 and -8
-      else if (value % 15 !== 0 && value <= 2 && value >= -8) {
-        overtime.value = value * 60;
-      }
-      //invalid value
-      else if (value % 15 !== 0) {
-        overtime.value = 0;
-      }
-    }
-
-    return {
-      //data
-      date,
-      overtime,
-      shortcuts,
-
-      //computed
-      getOvertime,
-
-      //functions
-      addOvertime,
-      overtimeInputChanged,
-      formatDateDayMonthYear,
-      formatOvertime,
-    };
+const store = useOvertimeStore();
+const date = ref(new Date());
+const overtime = ref(0);
+const shortcuts = [
+  {
+    text: "Today",
+    value: new Date(),
   },
-};
+  {
+    text: "Yesterday",
+    value: () => {
+      const date = new Date();
+      date.setTime(date.getTime() - 3600 * 1000 * 24);
+      return date;
+    },
+  },
+];
+
+onMounted(async () => {
+  //? load store in overview
+  store.hydrate();
+});
+
+const overtimeList = computed(() => {
+  return store.overtime;
+});
+
+async function addOvertime() {
+  //TODO sometimes date does not work, select dec.1
+  //TODO selecting passed date does not work
+  //TODO selecting current date also saves time
+  if (date.value && overtime.value) {
+    // check if entry for given date already exists
+    if (
+      store.overtime.filter((el) => {
+        return el.date.getTime() === date.value.getTime();
+      }).length
+    ) {
+      //TODO get old overtime
+      try {
+        await ElMessageBox.confirm(
+          `Replace old value: ${overtime.value} with new value: ${overtime.value}?`,
+          `Entry for ${date.value.toLocaleDateString()} already exists`,
+          {
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+          }
+        );
+        //TODO overwrite entry
+        successNotification("Overwrite completed");
+      } catch {
+        infoNotification("Overwrite canceled");
+      }
+      return;
+    }
+    addEntry();
+  }
+}
+
+async function addEntry() {
+  const overtimeObject = {
+    date: date.value,
+    minutes: overtime.value,
+    overtime: overtime.value,
+  };
+  try {
+    await store.addOvertime(overtimeObject);
+    successNotification("Adding Overtime completed");
+  } catch {
+    errorNotification("Adding Overtime failed");
+  }
+}
+
+//allow user to input hours
+//TODO input does not always refresh, cause technically value doesnt change
+function overtimeInputChanged(value) {
+  if (!value) return;
+  const separator = ".";
+  if (value.toString().includes(separator)) {
+    const valueString = value.toString();
+    const hours = valueString.substring(0, valueString.indexOf(separator));
+    const minutes = valueString.substring(
+      valueString.indexOf(separator) + 1,
+      valueString.length
+    );
+
+    const newValue = hours * 60 + Number(minutes === "3" ? 30 : minutes);
+    overtime.value = hours <= 2 && hours >= -8 ? newValue : 0;
+  }
+  //check if value ist between 2 and -8
+  else if (value % 15 !== 0 && value <= 2 && value >= -8) {
+    overtime.value = value * 60;
+  }
+  //invalid value
+  else if (value % 15 !== 0) {
+    overtime.value = 0;
+  }
+}
 </script>
 
 <style lang="scss" scoped>

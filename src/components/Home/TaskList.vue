@@ -16,12 +16,10 @@
 
         <div class="btn-group">
           <el-button type="danger" @click="resetAll">Reset all</el-button>
-          <el-button @click="AddNewTask">Add new Task</el-button>
-          <el-button
-            class="feierabend"
-            type="primary"
-            @click="Feierabend"
-          >Feierabend</el-button>
+          <el-button @click="store.addTask">Add new Task</el-button>
+          <el-button class="feierabend" type="primary" @click="finishWorkday"
+            >Feierabend</el-button
+          >
         </div>
       </div>
     </template>
@@ -34,102 +32,75 @@
   </Card>
 </template>
 
-<script>
+<script setup>
 import { ref, computed, onMounted } from "vue";
 import Task from "./Task.vue";
 import Dialog from "./Dialog.vue";
 import { convertMinsToHrsMins } from "../../services/formatter";
 import { ElMessageBox } from "element-plus";
 import Card from "../Card.vue";
-import {
-  hasTasks,
-  LoadWorkday,
-  tasks,
-  worktime,
-  percentage,
-  isFinished,
-  AddNewTask,
-  FinishWorkDay,
-  ResetAll,
-} from "@/store/WorktimeTracker.js";
+import { storeToRefs } from "pinia";
+import { useWorkdayStore } from "../../store/WorkdayStore.js";
 
-export default {
-  components: { Task, Dialog, Card },
-  setup() {
-    const showDialog = ref(false);
+const store = useWorkdayStore();
+const showDialog = ref(false);
+const { tasks, percentage, isFinished, time } = storeToRefs(store);
 
-    onMounted(async () => {
-      try {
-        await LoadWorkday();
-      } catch {
-        //TODO error message "reading old workday went wrong"
-      }
-      if (hasTasks.value) return;
-      AddNewTask();
-    });
+onMounted(async () => {
+  try {
+    await store.hydrate();
+  } catch {
+    //TODO error message "reading old workday went wrong"
+  }
+  if (store.hasTasks) return;
+  store.addTask();
+});
 
-    //TODO why not convert in store?
-    const convertedWorkTime = computed(() => {
-      return convertMinsToHrsMins(worktime.value);
-    });
+//TODO why not convert in store?
+const convertedWorkTime = computed(() => {
+  return convertMinsToHrsMins(time);
+});
 
-    const customColorMethod = (percentage) => {
-      if (isFinished.value && percentage < 100) {
-        return "#fc0a0a";
-      }
-      if (isFinished.value && percentage >= 100) {
-        return "#67c23a";
-      }
+const customColorMethod = (percentage) => {
+  if (isFinished.value && percentage < 100) {
+    return "#fc0a0a";
+  }
+  if (isFinished.value && percentage >= 100) {
+    return "#67c23a";
+  }
 
-      return "#F39221";
-    };
-
-    function Feierabend() {
-      FinishWorkDay();
-
-      //TODO enable for 1.0
-      // showDialog.value = true;
-    }
-
-    function cancelDialog() {
-      showDialog.value = false;
-    }
-
-    function confirmDialog() {
-      showDialog.value = false;
-      //TODO auto add overtime
-    }
-
-    async function resetAll() {
-      await ElMessageBox.confirm(
-        `Are you sure you want to reset all tasks?`,
-        `Confirm Reset`,
-        {
-          confirmButtonText: "OK",
-          cancelButtonText: "Cancel",
-        }
-      );
-      ResetAll();
-    }
-
-    return {
-      //data
-      showDialog,
-      //computed
-      tasks,
-      convertedWorkTime,
-      percentage,
-      isFinished,
-      //functions
-      customColorMethod,
-      Feierabend,
-      AddNewTask,
-      cancelDialog,
-      confirmDialog,
-      resetAll,
-    };
-  },
+  return "#F39221";
 };
+
+function finishWorkday() {
+  store.calculateWorkTime();
+
+  //TODO enable for 1.0
+  // showDialog.value = true;
+}
+
+function cancelDialog() {
+  showDialog.value = false;
+}
+
+function confirmDialog() {
+  showDialog.value = false;
+  //TODO auto add overtime
+}
+
+async function resetAll() {
+  await ElMessageBox.confirm(
+    `Are you sure you want to reset all tasks?`,
+    `Confirm Reset`,
+    {
+      confirmButtonText: "OK",
+      cancelButtonText: "Cancel",
+    }
+  );
+  try {
+    store.dehydrate();
+  } catch {}
+}
 </script>
 
 <style lang="scss" scoped>
