@@ -3,6 +3,7 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import installElementPlus from "./plugins/element";
+import "element-plus/theme-chalk/src/message.scss";
 import { createDataBase } from "./api/db";
 import { createPinia } from "pinia";
 

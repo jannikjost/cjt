@@ -16,7 +16,7 @@
 
         <div class="btn-group">
           <el-button type="danger" @click="resetAll">Reset all</el-button>
-          <el-button @click="store.addTask">Add new Task</el-button>
+          <el-button @click="workdayStore.addTask">Add new Task</el-button>
           <el-button class="feierabend" type="primary" @click="finishWorkday"
             >Feierabend</el-button
           >
@@ -42,19 +42,9 @@ import Card from "../Card.vue";
 import { storeToRefs } from "pinia";
 import { useWorkdayStore } from "../../store/WorkdayStore.js";
 
-const store = useWorkdayStore();
+const workdayStore = useWorkdayStore();
 const showDialog = ref(false);
-const { tasks, percentage, isFinished, time } = storeToRefs(store);
-
-onMounted(async () => {
-  try {
-    await store.hydrate();
-  } catch {
-    //TODO error message "reading old workday went wrong"
-  }
-  if (store.hasTasks) return;
-  store.addTask();
-});
+const { tasks, percentage, isFinished, time } = storeToRefs(workdayStore);
 
 //TODO why not convert in store?
 const convertedWorkTime = computed(() => {
@@ -73,7 +63,7 @@ const customColorMethod = (percentage) => {
 };
 
 function finishWorkday() {
-  store.calculateWorkTime();
+  workdayStore.calculateWorkTime();
 
   //TODO enable for 1.0
   // showDialog.value = true;
@@ -98,7 +88,7 @@ async function resetAll() {
     }
   );
   try {
-    store.dehydrate();
+    workdayStore.dehydrate();
   } catch {}
 }
 </script>

@@ -1,26 +1,22 @@
 <template>
   <div class="overview">
     <el-card><History /></el-card>
-    <el-card><LastYear /></el-card>
+    <el-card><OvertimeByMonths /></el-card>
     <el-card class="chart"><Chart /></el-card>
   </div>
 </template>
 
-<script>
+<script setup>
 import History from "../components/Overview/History.vue";
-import LastYear from "../components/Overview/LastYear.vue";
+import OvertimeByMonths from "../components/Overview/OvertimeByMonths.vue";
 import Chart from "../components/Overview/Chart.vue";
+import { onMounted } from "vue";
+import { useOvertimeStore } from "../store/OvertimeStore";
 
-export default {
-  components: {
-    History,
-    LastYear,
-    Chart,
-  },
-  setup() {
-    return {};
-  },
-};
+onMounted(() => {
+  const overtimeStore = useOvertimeStore();
+  overtimeStore.hydrate();
+});
 </script>
 
 <style lang="scss" scoped>

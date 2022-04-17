@@ -15,7 +15,7 @@
         to="/overview"
         >Overview</router-link
       >
-       <router-link
+      <router-link
         class="nav__element link"
         :class="{ link__active: isLinkActive('/settings') }"
         to="/settings"
@@ -34,30 +34,19 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 
-export default {
-  name: "App",
-  components: {},
-  setup() {
-    const route = useRoute();
+const route = useRoute();
 
-    const path = computed(() => route.path);
+const path = computed(() => route.path);
 
-    const versionString = "cjt Version 0.1.0";
+const versionString = "cjt Version 0.1.0";
 
-    function isLinkActive(params) {
-      return path.value === params;
-    }
-
-    return {
-      versionString,
-      isLinkActive,
-    };
-  },
-};
+function isLinkActive(params) {
+  return path.value === params;
+}
 </script>
 
 <style lang="scss">

@@ -13,25 +13,15 @@
   </el-dialog>
 </template>
 
-<script>
-export default {
-  props: { showDialog: Boolean, tasks: Array },
-  emits: ["cancel", "confirm"],
-  setup(props, { emit }) {
-    const show = true;
-    function Cancel() {
-      emit("cancel");
-    }
-    function Confirm() {
-      emit("confirm");
-    }
-    return {
-      show,
-      Cancel,
-      Confirm,
-    };
-  },
-};
+<script setup>
+const emit = defineEmits()
+const show = true;
+function Cancel() {
+  emit("cancel");
+}
+function Confirm() {
+  emit("confirm");
+}
 </script>
 
 <style lang="scss" scoped></style>

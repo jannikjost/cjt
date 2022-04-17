@@ -5,15 +5,20 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import History from "../components/Overview/History.vue";
 import TaskList from "../components/Home/TaskList.vue";
 import Card from "../components/Card.vue";
+import { useWorkdayStore } from "../store/WorkdayStore.js";
+import { useOvertimeStore } from "../store/OvertimeStore";
+import { onMounted } from "vue";
 
-export default {
-  name: "Home",
-  components: { History, TaskList, Card },
-};
+onMounted(async () => {
+  const overtimeStore = useOvertimeStore();
+  overtimeStore.hydrate();
+  const workdayStore = useWorkdayStore();
+  workdayStore.hydrate();
+});
 </script>
 
 <style lang="scss" scoped>

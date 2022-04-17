@@ -25,24 +25,14 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from "vue";
+import { computed } from "vue";
 import {
   formatOvertime,
   formatDateMonthYear,
 } from "./../../services/formatter";
 import { useOvertimeStore } from "../../store/OvertimeStore";
-import { errorNotification } from "../../services/notificationService";
 
-//TODO rename to overtime by months
 const overtimeStore = useOvertimeStore();
-
-onMounted(async () => {
-  try {
-    await overtimeStore.hydrate();
-  } catch {
-    errorNotification("could not load Overtime data");
-  }
-});
 
 const storeOvertimeData = computed(() => {
   return formatOvertimeDate([...overtimeStore.overtime]);

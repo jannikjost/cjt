@@ -54,10 +54,13 @@ export const useWorkdayStore = defineStore("workday", {
         return task;
       });
       this.setWorkday(parsedWorkday);
+      //make sure always one task exists
+      if (this.hasTasks) return;
+      this.addTask();
     },
     async dehydrate() {
       this.$reset();
-      return updateWorkday($state);
+      return updateWorkday(this.$state);
     },
     addTask() {
       this.tasks.push({
@@ -66,14 +69,13 @@ export const useWorkdayStore = defineStore("workday", {
         times: [{ id: v4() }],
         time: 0,
       });
-      //? does $state work
       return updateWorkday(this.$state);
     },
     renameTask(id, newName) {
       const task = this.getTaskById(id);
       if (!task) return;
       task.name = newName;
-      return updateWorkday($state);
+      return updateWorkday(this.$state);
     },
 
     resetTask(id) {
@@ -121,7 +123,7 @@ export const useWorkdayStore = defineStore("workday", {
       this.time = tempWorkTime;
       this.percentage = this.time > 0 ? 8 / this.time : 0;
 
-      return updateWorkday($state);
+      return updateWorkday(this.$state);
     },
 
     // time
@@ -136,7 +138,7 @@ export const useWorkdayStore = defineStore("workday", {
       this.calculateProgress(false);
       this.calculateTaskTime(props.taskId);
 
-      return this.calculateWorkTime(workday.value);
+      return this.calculateWorkTime();
     },
     startTime(props) {
       const time = this.getTimeById({
@@ -161,7 +163,7 @@ export const useWorkdayStore = defineStore("workday", {
       this.calculateProgress(false);
       this.calculateTaskTime(params.taskId);
 
-      return this.calculateWorkTime(workday.value);
+      return this.calculateWorkTime();
     },
     addTime(id) {
       const task = GetTaskById(id);

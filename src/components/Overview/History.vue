@@ -41,7 +41,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, computed } from "vue";
 import { ElMessageBox } from "element-plus";
 import { useOvertimeStore } from "../../store/OvertimeStore";
 import {
@@ -54,7 +54,7 @@ import {
   successNotification,
 } from "../../services/notificationService";
 
-const store = useOvertimeStore();
+const overtimeStore = useOvertimeStore();
 const date = ref(new Date());
 const overtime = ref(0);
 const shortcuts = [
@@ -72,13 +72,8 @@ const shortcuts = [
   },
 ];
 
-onMounted(async () => {
-  //? load store in overview
-  store.hydrate();
-});
-
 const overtimeList = computed(() => {
-  return store.overtime;
+  return overtimeStore.overtime;
 });
 
 async function addOvertime() {
@@ -88,7 +83,7 @@ async function addOvertime() {
   if (date.value && overtime.value) {
     // check if entry for given date already exists
     if (
-      store.overtime.filter((el) => {
+      overtimeStore.overtime.filter((el) => {
         return el.date.getTime() === date.value.getTime();
       }).length
     ) {
@@ -120,7 +115,7 @@ async function addEntry() {
     overtime: overtime.value,
   };
   try {
-    await store.addOvertime(overtimeObject);
+    await overtimeStore.addOvertime(overtimeObject);
     successNotification("Adding Overtime completed");
   } catch {
     errorNotification("Adding Overtime failed");

@@ -20,48 +20,35 @@
   </Card>
 </template>
 
-<script>
+<script setup>
 import { ref } from "vue";
 import Card from "../components/Card.vue";
 import ProjectList from "../components/Settings/ProjectList.vue";
 
-export default {
-  components: { Card, ProjectList },
-  setup() {
-    const formIsValid = ref(true);
-    const weeklyHours = ref({ value: "", isValid: true });
-    const projectList = ref({ value: "", isValid: true });
+const formIsValid = ref(true);
+const weeklyHours = ref({ value: "", isValid: true });
+const projectList = ref({ value: "", isValid: true });
 
-    function validateForm() {
-      formIsValid.value = true;
-      if (
-        !weeklyHours.value.value ||
-        weeklyHours.value.value < 0 ||
-        weeklyHours.value.value > 10
-      ) {
-        weeklyHours.value.isValid = false;
-        formIsValid.value = false;
-      }
-    }
+function validateForm() {
+  formIsValid.value = true;
+  if (
+    !weeklyHours.value.value ||
+    weeklyHours.value.value < 0 ||
+    weeklyHours.value.value > 10
+  ) {
+    weeklyHours.value.isValid = false;
+    formIsValid.value = false;
+  }
+}
 
-    function submitForm() {
-      validateForm();
-      if (!formIsValid.value) return;
-    }
+function submitForm() {
+  validateForm();
+  if (!formIsValid.value) return;
+}
 
-    function clearInput(input) {
-      this[input].isValid = true;
-    }
-
-    return {
-      weeklyHours,
-      projectList,
-
-      submitForm,
-      clearInput,
-    };
-  },
-};
+function clearInput(input) {
+  this[input].isValid = true;
+}
 </script>
 
 <style lang="scss" scoped>

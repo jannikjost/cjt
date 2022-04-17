@@ -28,7 +28,7 @@
   </el-collapse-item>
 </template>
 
-<script>
+<script setup>
 import { computed } from "vue";
 import Time from "./Time.vue";
 import Debounce from "./../../utils/debounce";
@@ -41,79 +41,64 @@ import {
   successNotification,
 } from "../../services/notificationService";
 
-export default {
-  components: { Time },
-  props: { id: String },
-  setup(props) {
-    const store = useWorkdayStore();
-    const formattedTime = computed(() => {
-      return convertMinsToHrsMins(storeTask.value.time);
-    });
+const props = defineProps({
+  id: String,
+});
 
-    const storeTask = computed(() => {
-      return store.getTaskById(props.id);
-    });
+const workdayStore = useWorkdayStore();
+const formattedTime = computed(() => {
+  return convertMinsToHrsMins(storeTask.value.time);
+});
 
-    const storeTaskTimes = computed(() => {
-      return store.getTaskById(props.id).times;
-    });
+const storeTask = computed(() => {
+  return workdayStore.getTaskById(props.id);
+});
 
-    function HandleRemoveWorkTime(param) {
-      store.removeTime({
-        taskId: props.id,
-        taskTimeId: param.id,
-      });
-    }
-    function HandleAddWorkTime() {
-      store.addTime(storeTask.value.id);
-    }
-    async function SyncTaskName(newName) {
-      try {
-        store.removeTask(storeTask.value.id, newName);
-      } catch {
-        errorNotification(
-          `Rename of Task "${storeTask.value.name}" was not successful`
-        );
+const storeTaskTimes = computed(() => {
+  return workdayStore.getTaskById(props.id).times;
+});
+
+function HandleRemoveWorkTime(param) {
+  workdayStore.removeTime({
+    taskId: props.id,
+    taskTimeId: param.id,
+  });
+}
+function HandleAddWorkTime() {
+  workdayStore.addTime(storeTask.value.id);
+}
+async function SyncTaskName(newName) {
+  try {
+    workdayStore.renameTask(storeTask.value.id, newName);
+  } catch {
+    errorNotification(
+      `Rename of Task "${storeTask.value.name}" was not successful`
+    );
+  }
+}
+
+async function RemoveTaskClick() {
+  const moreThanOneTask = workdayStore.hastMoreThanOneTask;
+  const text = moreThanOneTask ? "delete" : "reset";
+  try {
+    await ElMessageBox.confirm(
+      `Are you sure you want to ${text} Task "${storeTask.value.name}" with ${formattedTime.value} h?`,
+      `Confirm ${text} Task`,
+      {
+        confirmButtonText: "OK",
+        cancelButtonText: "Cancel",
       }
+    );
+    if (moreThanOneTask) {
+      workdayStore.removeTask(props.id);
+    } else {
+      workdayStore.resetTask(props.id);
     }
-
-    async function RemoveTaskClick() {
-      const moreThanOneTask = store.hastMoreThanOneTask;
-      const text = moreThanOneTask ? "delete" : "reset";
-      try {
-        await ElMessageBox.confirm(
-          `Are you sure you want to ${text} Task "${storeTask.value.name}" with ${formattedTime.value} h?`,
-          `Confirm ${text} Task`,
-          {
-            confirmButtonText: "OK",
-            cancelButtonText: "Cancel",
-          }
-        );
-        if (moreThanOneTask) {
-          store.removeTask(props.id);
-        } else {
-          store.resetTask(props.id);
-        }
-        successNotification(`${text} completed`);
-      } catch {
-        infoNotification(`${text} canceled`);
-      }
-    }
-
-    return {
-      //computed
-      formattedTime,
-      storeTask,
-      storeTaskTimes,
-      //functions
-      HandleRemoveWorkTime,
-      HandleAddWorkTime,
-      SyncTaskName,
-      Debounce,
-      RemoveTaskClick,
-    };
-  },
-};
+    successNotification(`${text} completed`);
+  } catch {
+    infoNotification(`${text} canceled`);
+  }
+}
 </script>
 
 <style lang="scss" scoped>
