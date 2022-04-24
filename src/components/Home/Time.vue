@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useWorkdayStore } from "../../store/WorkdayStore";
+import { useWorkdayStore } from "../../store/WorkdayStore.js";
 
 const emit = defineEmits()
 const props = defineProps({

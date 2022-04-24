@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul class="projectList">
     <li v-for="project in projects" :key="project.name" class="project">
       <input :value="project.name" />
       <button
@@ -11,7 +11,7 @@
       <button @click="deleteProjectHandle(project)">x</button>
     </li>
   </ul>
-  <button @click="addProjectHandle">+</button>
+  <button class="addProject" @click="addProjectHandle">+</button>
 </template>
 
 <script>

@@ -103,10 +103,9 @@ export const useWorkdayStore = defineStore("workday", {
       this.isFinished = !prop;
     },
     calculateTaskTime(id) {
-      const task = this.GetTaskById(id);
+      const task = this.getTaskById(id);
       if (!task) return;
       let tempTime = 0;
-      //TODO negative times
       task.times.forEach((el) => {
         if (!el.time) {
           return;
