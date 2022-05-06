@@ -57,8 +57,8 @@ whenever(keys.up, () => {
 
 whenever(keys.enter, () => {
   if (props.displayed) {
-    if (selectedCommand.value.function) {
-      selectedCommand.value.function()
+    if (selectedCommand.value.command) {
+      selectedCommand.value.command()
     } else {
       console.log('No command')
     }

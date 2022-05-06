@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { v4 } from "uuid";
 import { getWorkday, updateWorkday } from "../api/db";
+import { useCommandStore } from "./CommandStore.js";
 
 export const useWorkdayStore = defineStore("workday", {
   state: () => {
@@ -54,9 +55,11 @@ export const useWorkdayStore = defineStore("workday", {
         return task;
       });
       this.setWorkday(parsedWorkday);
+      this.addCommands();
       //make sure always one task exists
       if (this.hasTasks) return;
       this.addTask();
+
     },
     async dehydrate() {
       this.$reset();
@@ -188,6 +191,21 @@ export const useWorkdayStore = defineStore("workday", {
       }
 
       return this.calculateWorkTime();
+    },
+
+    addCommands() {
+      const commandStore = useCommandStore();
+      commandStore.register({
+        title: "Mittagspause",
+        description: "Not implemented",
+        command: () => {},
+      });
+
+      commandStore.register({
+        title: "Stop all",
+        description: "Not implemented",
+        command: () => {},
+      });
     },
   },
 });
