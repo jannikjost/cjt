@@ -14,6 +14,6 @@ createDataBase()
     app.use(createPinia());
     app.use(router).mount("#app");
   })
-  .catch(() => {
-    console.error("Fatal Error: Connection to indexedDb failed");
+  .catch((err) => {
+    console.error("Fatal Error: Connection to indexedDb failed", err);
   });

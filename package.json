@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^2.3.1",
+    "@vueuse/core": "^8.4.2",
     "element-plus": "^2.1.10",
     "pinia": "^2.0.13",
     "register-service-worker": "^1.7.2",

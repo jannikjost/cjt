@@ -1,24 +1,33 @@
+<script setup>
+import { ref } from "vue";
+import CommandPalette from "./components/CommandPalette.vue";
+import { useMagicKeys, whenever } from "@vueuse/core";
+
+const versionString = "cjt Version 0.1.0";
+const displayCommandPalette = ref(false);
+const keys = useMagicKeys();
+
+whenever(keys.Escape, () => {
+  if (displayCommandPalette.value) {
+    displayCommandPalette.value = false;
+  }
+});
+
+whenever(keys.alt_k, () => {
+  displayCommandPalette.value = !displayCommandPalette.value;
+});
+</script>
+
 <template>
   <div class="app">
     <!-- navigation -->
     <nav class="nav">
       <div class="nav__element">logo</div>
-      <router-link
-        class="nav__element link"
-        :class="{ link__active: isLinkActive('/') }"
-        to="/"
-        >Home</router-link
-      >
-      <router-link
-        class="nav__element link"
-        :class="{ link__active: isLinkActive('/overview') }"
-        to="/overview"
+      <router-link class="nav__element link" to="/">Home</router-link>
+      <router-link class="nav__element link" to="/overview"
         >Overview</router-link
       >
-      <router-link
-        class="nav__element link"
-        :class="{ link__active: isLinkActive('/settings') }"
-        to="/settings"
+      <router-link class="nav__element link" to="/settings"
         >Settings</router-link
       >
     </nav>
@@ -31,23 +40,12 @@
         ><img class="github_logo" src="./assets/GitHub-Mark-32px.png"
       /></a>
     </footer>
+    <CommandPalette
+      v-show="displayCommandPalette"
+      :displayed="displayCommandPalette"
+    />
   </div>
 </template>
-
-<script setup>
-import { useRoute } from "vue-router";
-import { computed } from "vue";
-
-const route = useRoute();
-
-const path = computed(() => route.path);
-
-const versionString = "cjt Version 0.1.0";
-
-function isLinkActive(params) {
-  return path.value === params;
-}
-</script>
 
 <style lang="scss">
 @import "./styles/element-variables.scss";
@@ -106,7 +104,7 @@ body {
 .link:visited {
   color: inherit;
 }
-.link__active {
+.router-link-exact-active {
   border-bottom: 4px solid $--color-secondary;
   background-color: $--color-primary-dark;
   border-top: 4px solid $--color-primary-dark;
