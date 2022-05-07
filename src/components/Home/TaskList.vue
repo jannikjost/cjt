@@ -24,7 +24,7 @@ const { tasks, percentage, isFinished, time } = storeToRefs(workdayStore);
 
 //TODO why not convert in store?
 const convertedWorkTime = computed(() => {
-  return convertMinsToHrsMins(time);
+  return convertMinsToHrsMins(time.value);
 });
 
 const customColorMethod = (percentage) => {

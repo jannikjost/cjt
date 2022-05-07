@@ -1,25 +1,22 @@
-<template>
-  <div class="home">
-    <TaskList />
-    <Card><History /></Card>
-  </div>
-</template>
-
 <script setup>
 import History from "../components/Overview/History.vue";
 import TaskList from "../components/Home/TaskList.vue";
 import Card from "../components/Card.vue";
 import { useWorkdayStore } from "../store/WorkdayStore.js";
 import { useOvertimeStore } from "../store/OvertimeStore";
-import { onMounted } from "vue";
 
-onMounted(async () => {
-  const overtimeStore = useOvertimeStore();
-  overtimeStore.hydrate();
-  const workdayStore = useWorkdayStore();
-  workdayStore.hydrate();
-});
+const overtimeStore = useOvertimeStore();
+overtimeStore.hydrate();
+const workdayStore = useWorkdayStore();
+workdayStore.hydrate();
 </script>
+
+<template>
+  <div class="home">
+    <TaskList />
+    <Card><History /></Card>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .home {

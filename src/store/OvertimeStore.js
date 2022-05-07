@@ -7,6 +7,14 @@ export const useOvertimeStore = defineStore("overtime", {
       overtime: [],
     };
   },
+  getters: {
+    overtimeExists: (state) => {
+      return (date) =>
+        state.overtime.filter((el) => {
+          return el.date.getTime() === date.getTime();
+        }).length;
+    },
+  },
   actions: {
     async hydrate() {
       const res = await getData();

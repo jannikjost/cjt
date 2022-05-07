@@ -152,12 +152,12 @@ export const useWorkdayStore = defineStore("workday", {
       }
       time.startTime = props.startTime;
 
-      return updateWorkday(workday.value);
+      return updateWorkday(this.$state);
     },
     stopTime(params) {
       const time = this.getTimeById({
-        taskId: props.taskId,
-        timeId: props.timeId,
+        taskId: params.taskId,
+        timeId: params.timeId,
       });
       time.time = params.time;
       time.stopTime = params.stopTime;
@@ -168,13 +168,13 @@ export const useWorkdayStore = defineStore("workday", {
       return this.calculateWorkTime();
     },
     addTime(id) {
-      const task = GetTaskById(id);
+      const task = this.getTaskById(id);
       task.times.push({ id: v4() });
 
-      return updateWorkday(workday.value);
+      return updateWorkday(this.$state);
     },
     removeTime(props) {
-      const task = GetTaskById(props.taskId);
+      const task = this.getTaskById(props.taskId);
       if (task.times.length > 1) {
         task.times.forEach((element, index) => {
           if (element.id === props.taskTimeId) {
