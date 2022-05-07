@@ -39,9 +39,8 @@ function createDataBase() {
       var objectStore = db.createObjectStore(objectStoreName, {
         keyPath: "date",
       });
-      //TODO add new entry, minutes(overtime that day)
       objectStore.createIndex("date", "date", { unique: true });
-      objectStore.createIndex("overtime", "overtime", { unique: false });
+      objectStore.createIndex("minutes", "minutes", { unique: false });
       objectStore.transaction.oncomplete = function() {
         console.debug(objectStoreName + " successfully created");
       };

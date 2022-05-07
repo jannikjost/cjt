@@ -59,18 +59,14 @@ async function addEntry() {
   const overtimeObject = {
     date: date.value,
     minutes: minutes.value,
-    overtime: calculateOvertime(),
   };
   try {
     await overtimeStore.addOvertime(overtimeObject);
     successNotification("Adding Overtime completed");
-  } catch {
+  } catch (err) {
     errorNotification("Adding Overtime failed");
+    console.error(err);
   }
-}
-
-function calculateOvertime() {
-  return minutes.value
 }
 
 //allow user to input hours
@@ -105,7 +101,7 @@ function overtimeInputChanged(value) {
     <div class="table">
       <!-- //TODO add heigth option for Home -->
       <el-table
-        :data="overtimeStore.overtime"
+        :data="overtimeStore.overtimes"
         style="width: 100%"
         height="400px"
       >

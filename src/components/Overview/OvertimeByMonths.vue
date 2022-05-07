@@ -35,18 +35,18 @@ import { useOvertimeStore } from "../../store/OvertimeStore";
 const overtimeStore = useOvertimeStore();
 
 const storeOvertimeData = computed(() => {
-  return formatOvertimeDate([...overtimeStore.overtime]);
+  return formatOvertimeDate([...overtimeStore.overtimes]);
 });
 
 const year = computed(() => {
-  if (overtimeStore.overtime.length) {
+  if (overtimeStore.overtimes.length) {
     //? what happens if only one month is in db
     return (
       formatDateMonthYear(
-        overtimeStore.overtime[overtimeStore.overtime.length - 1].date
+        overtimeStore.overtimes[overtimeStore.overtimes.length - 1].date
       ) +
       " - " +
-      formatDateMonthYear(overtimeStore.overtime[0].date)
+      formatDateMonthYear(overtimeStore.overtimes[0].date)
     );
   }
   return "";
